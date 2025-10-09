@@ -737,8 +737,67 @@ class DAO
     // --------------------------------------------------------------------------------------
     
 
-    
-    
+    public function getLesTraces($idUtilisateur){
+
+
+
+        $txt_req = "SELECT tracegps_vue_utilisateurs.nbTraces";
+        $txt_req .= "(SELECT COUNT(*) FROM tracegps_traces WHERE tracegps_traces.idUtilisateur = tracegps_vue_utilisateurs.id) AS nbTraces, ";
+        $txt_req .= "FROM tracegps_vue_utilisateurs ";
+        $txt_req .= "INNER JOIN tracegps_autorisations ON tracegps_vue_utilisateurs.id = tracegps_autorisations.idAutorisant ";
+        $txt_req .= "WHERE tracegps_vue_utilisateurs.niveau = 1 AND tracegps_autorisations.idAutorise = :idUtilisateur ";
+        $txt_req .= "ORDER BY tracegps_vue_utilisateurs.pseudo";
+
+        $req = $this->cnx->prepare($txt_req);
+
+        // liaison de la requête et de ses paramètres
+        $req->bindValue(":idUtilisateur", $idUtilisateur, PDO::PARAM_INT);
+
+    }
+
+
+
+
+
+    public function creerUneTrace($UneTrace) {
+
+        /*         creerUneTrace($uneTrace)
+         @Rôle : enregistre la trace $uneTrace dans la table tracegps_traces et met à jour l'objet $uneTrace
+         avec l'identifiant (auto_increment) attribué par le SGBD
+         Paramètres à fournir :
+         $uneTrace : la trace à enregistrer
+         @Valeur de retour : un booléen
+        true si l'enregistrement s'est bien passé
+        false sinon
+        Particularités :
+        -      Si la date de fin est nulle (cas d'une trace non terminée), le champ dateFin prendra une valeur
+                nulle (PDO::PARAM_NULL) ; sinon il prendra une valeur chaine (PDO::PARAM_STR).
+        - On n'enregistre pas les points de la trace, même si l'objet $uneTrace en contient.
+
+
+        @return : true
+            */
+
+        $txt_req = "INSERT INTO tracegps_traces (id, dateDebut, dateFin, terminee, idUtilisateur, pseudo, nbPoints)";
+        $txt_req .= " values (:id, :dateDebut, :dateFin, :terminee, :IdUtilisateur, :pseudo, :nbPoints)";
+
+        $req = $this->cnx->prepare($txt_req);
+       
+
+        $req->bindValue("id", mb_convert_encoding($UneTrace->getId , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
+        $req->bindValue("dateDebut", mb_convert_encoding($UneTrace->dateDebut, 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
+        $req->bindValue("dateFin", mb_convert_encoding($UneTrace->dateFin, 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
+        $req->bindValue("terminee", mb_convert_encoding($UneTrace->terminee, 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
+        $req->bindValue("IdUtilisateur", mb_convert_encoding($UneTrace->getId , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
+        $req->bindValue("pseudo", mb_convert_encoding($UneTrace->getPseudo , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
+        $req->bindValue("nbPoints", mb_convert_encoding($UneTrace->getLesPointsDeTrace , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
+
+        $ok = $req->execute();
+
+        return $ok;
+
+    }
+
     
     
     
@@ -1162,8 +1221,9 @@ class DAO
 
 
 
-    
+
 } // fin de la classe DAO
+
 
 // ATTENTION : on ne met pas de balise de fin de script pour ne pas prendre le risque
 // d'enregistrer d'espaces après la balise de fin de script !!!!!!!!!!!!
