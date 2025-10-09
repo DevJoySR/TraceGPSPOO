@@ -504,7 +504,7 @@ class DAO
 
     public function autoriseAConsulter($idAutorisant, $idAutorise)
     /*
-    *    Indique si l'utilisateur $idAutorisant autorise l'utilisateur $idAutorise à consulter ses traces
+    *   Indique si l'utilisateur $idAutorisant autorise l'utilisateur $idAutorise à consulter ses traces
     *   
     *   @param : $idAutorisant : l'id de l'utilisateur qui autorise
     *            $idAutorise : l'id de l'utilisateur qui est autorisé
@@ -535,8 +535,65 @@ class DAO
     }
 }
 
+    public function creerUneAutorisation($idAutorisant, $idAutorise)
+    /*
+    *   Enregistre l'autorisation ($idAutorisant, $idAutorise) dans la table tracegps_autorisations
+    *   
+    *   Appel de la méthode autoriseAConsulter() afin de déterminer si l'autorisation a déjà été emise
+    *
+    *   @param : $idAutorisant : l'id de l'utilisateur qui autorise
+    *            $idAutorise : l'id de l'utilisateur qui est autorisé
+    *   @returns : true  si l'enregistrement s'est bien passé false sinon
+    */
+    {
+        // // préparation de la requête de recherche
+        // $txt_req = "SELECT COUNT(*) AS nb FROM tracegps_autorisations";
+        // $txt_req .= " WHERE idAutorisant = :idAutorisant AND idAutorise = :idAutorise";
+        // $req = $this->cnx->prepare($txt_req);
 
+        // // liaison de la requête et de ses paramètres
+        // $req->bindValue(":idAutorisant", $idAutorisant, PDO::PARAM_INT);
+        // $req->bindValue(":idAutorise", $idAutorise, PDO::PARAM_INT);
 
+        // // exécution de la requête
+        // $req->execute();
+
+        // // extrait la ligne suivante
+        // $resultat = $req->fetch(PDO::FETCH_OBJ);
+
+        // if ($resultat && $resultat->nb > 0) {
+        //     return false;
+        // }
+        
+        $dao = new DAO();
+        $ok=$dao->autoriseAConsulter($idAutorisant, $idAutorise);
+
+        if($ok)
+        { 
+            return false;
+        }
+        $txt_req2 = "INSERT INTO tracegps_autorisations (idAutorisant, idAutorise)";
+        $txt_req2 .= " VALUES(:idAutorisant, :idAutorise)";
+    
+        $req2 = $this->cnx->prepare($txt_req2);
+
+        // liaison de la requête et de ses paramètres
+        $req2->bindValue(":idAutorisant", $idAutorisant, PDO::PARAM_INT);
+        $req2->bindValue(":idAutorise", $idAutorise, PDO::PARAM_INT);
+
+        // exécution de la requête
+        $req2->execute();
+
+        // extrait la ligne suivante
+        $resultat2 = $req2->fetch(PDO::FETCH_OBJ);
+
+        if ($resultat2) {
+        return true;
+    } 
+    else {
+        return false;
+    }
+}
     
     
     
