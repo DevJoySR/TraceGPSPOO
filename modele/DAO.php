@@ -775,8 +775,9 @@ class DAO
         - On n'enregistre pas les points de la trace, même si l'objet $uneTrace en contient.
 
 
-        @return : true
+        @return : true or false
             */
+
 
         $txt_req = "INSERT INTO tracegps_traces (id, dateDebut, dateFin, terminee, idUtilisateur, pseudo, nbPoints)";
         $txt_req .= " values (:id, :dateDebut, :dateFin, :terminee, :IdUtilisateur, :pseudo, :nbPoints)";
@@ -786,7 +787,17 @@ class DAO
 
         $req->bindValue("id", mb_convert_encoding($UneTrace->getId , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
         $req->bindValue("dateDebut", mb_convert_encoding($UneTrace->dateDebut, 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
-        $req->bindValue("dateFin", mb_convert_encoding($UneTrace->dateFin, 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
+
+        // On regarde si dateFin n'est pas null (elle l'es si la trace n'est pas terminé)
+        // on le remplacera donc par null
+        if ($UneTrace->dateFin === null) {
+            $req->bindValue("dateFin", mb_convert_encoding($UneTrace->dateFin, 'UTF-8', 'ISO-8859-1'), PDO::PARAM_NULL);
+
+        } else {
+            $req->bindValue("dateFin", mb_convert_encoding($UneTrace->dateFin, 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
+        }
+        
+
         $req->bindValue("terminee", mb_convert_encoding($UneTrace->terminee, 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
         $req->bindValue("IdUtilisateur", mb_convert_encoding($UneTrace->getId , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
         $req->bindValue("pseudo", mb_convert_encoding($UneTrace->getPseudo , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
@@ -794,9 +805,14 @@ class DAO
 
         $ok = $req->execute();
 
-        return $ok;
+        if ($ok){
+            return true;
+        }
+        else{
+        return true;
 
     }
+}
 
     
     
