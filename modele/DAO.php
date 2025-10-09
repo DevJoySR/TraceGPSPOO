@@ -936,7 +936,11 @@ class DAO
     // début de la zone attribuée au développeur 3 (Valentin Verdier) : lignes 750 à 949
     // --------------------------------------------------------------------------------------
     
-    
+    //méthode pour supprimer une autorisation
+    public function supprimerUneAutorisation($idAutorisant, $idAutorise):bool
+    {
+        
+    }       
     
     
     
