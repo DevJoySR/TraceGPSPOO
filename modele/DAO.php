@@ -937,13 +937,73 @@ class DAO
     // --------------------------------------------------------------------------------------
     
     //méthode pour supprimer une autorisation
-    public function supprimerUneAutorisation($idAutorisant, $idAutorise):bool
+    // public function supprimerUneAutorisation($idAutorisant, $idAutorise):bool
+    // {
+    //     if ($idAutorise === "") {
+    //     return ;
+    // }       
+    // }
+    
+    
+    public function getLesPointsDeTrace($idTrace): array
     {
+        /*
+        * rôle : fournit la collection des points de la trace $idTrace
+        * @param : $idTrace : identifiant de la trace
+        * @return : collection d'objets PointDeTrace
+        *           la collection des points de la trace $idTrace
+        */
+       
+       
+       
+       
+       
+       
+       
+       
+        // //préparation de la requête
+        // $txt_req = "SELECT idTrace, id, latitude, longitude, altitude, dateHeure, rythmeCardio";
+        // $txt_req .= " FROM tracegps_points";
+        // $txt_req .= " WHERE idTrace = 1";
+
+        // $req = $this->cnx->prepare($txt_req);
+ 
+        // // liaison de la requête et de ses paramètres
+        // $req->bindValue(":idTrace", $idTrace, PDO::PARAM_INT);
+
+        // // exécution de la requête
+        // $req->execute();
+
+        // // extrait la ligne suivante
+        // $unPoint = $req->fetch(PDO::FETCH_OBJ);
         
-    }       
-    
-    
-    
+        // // construction d'une collection d'objets Utilisateur
+        // $lesPoints = array();
+
+        // // tant qu'une ligne est trouvée :
+        // while($unPoint)
+        // {
+        //     // création d'un objet Trace
+        //     $unIdTrace = mb_convert_encoding($unPoint->idTrace, 'UTF-8', 'ISO-8859-1');
+        //     $unId = mb_convert_encoding($unPoint->id, 'UTF-8', 'ISO-8859-1');
+        //     $uneLatitude = mb_convert_encoding($unPoint->latitude, 'UTF-8', 'ISO-8859-1');
+        //     $uneLongitude = mb_convert_encoding($unPoint->longitude, 'UTF-8', 'ISO-8859-1');
+        //     $uneAltitude = mb_convert_encoding($unPoint->altitude, 'UTF-8', 'ISO-8859-1');
+        //     $uneDateHeure = mb_convert_encoding($unPoint->dateHeure, 'UTF-8', 'ISO-8859-1');
+        //     $unRythmeCardio = mb_convert_encoding($unPoint->rythmeCardio, 'UTF-8', 'ISO-8859-1');
+       
+        //     $lePoint = new Trace($unIdTrace, $unId, $uneLatitude, $uneLongitude, $uneAltitude, $uneDateHeure, $unRythmeCardio);
+        //      // ajout de l'utilisateur à la collection
+        //     $lesPoints[] = $lePoint;
+        //     // extrait la ligne suivante
+        //     $unPoint = $req->fetch(PDO::FETCH_OBJ);
+        // }
+        // // libère les ressources du jeu de données
+        // $req->closeCursor();
+
+        // // fourniture de la collection
+        // return $lesPoints;
+    }
     
     
     
