@@ -504,7 +504,7 @@ class DAO
 
     public function autoriseAConsulter($idAutorisant, $idAutorise)
     /*
-    *    Indique si l'utilisateur $idAutorisant autorise l'utilisateur $idAutorise à consulter ses traces
+    *   Indique si l'utilisateur $idAutorisant autorise l'utilisateur $idAutorise à consulter ses traces
     *   
     *   @param : $idAutorisant : l'id de l'utilisateur qui autorise
     *            $idAutorise : l'id de l'utilisateur qui est autorisé
@@ -535,7 +535,64 @@ class DAO
     }
 }
 
+    public function creerUneAutorisation($idAutorisant, $idAutorise)
+    /*
+    *   Enregistre l'autorisation ($idAutorisant, $idAutorise) dans la table tracegps_autorisations
+    *   
+    *   Appel de la méthode autoriseAConsulter() afin de déterminer si l'autorisation a déjà été emise
+    *
+    *   @param : $idAutorisant : l'id de l'utilisateur qui autorise
+    *            $idAutorise : l'id de l'utilisateur qui est autorisé
+    *   @returns : true  si l'enregistrement s'est bien passé false sinon
+    */
+    {
+        // // préparation de la requête de recherche
+        // $txt_req = "SELECT COUNT(*) AS nb FROM tracegps_autorisations";
+        // $txt_req .= " WHERE idAutorisant = :idAutorisant AND idAutorise = :idAutorise";
+        // $req = $this->cnx->prepare($txt_req);
 
+        // // liaison de la requête et de ses paramètres
+        // $req->bindValue(":idAutorisant", $idAutorisant, PDO::PARAM_INT);
+        // $req->bindValue(":idAutorise", $idAutorise, PDO::PARAM_INT);
+
+        // // exécution de la requête
+        // $req->execute();
+
+        // // extrait la ligne suivante
+        // $resultat = $req->fetch(PDO::FETCH_OBJ);
+
+        // if ($resultat && $resultat->nb > 0) {
+        //     return false;
+        // }
+        
+        $dao = new DAO();
+        $ok=$dao->autoriseAConsulter($idAutorisant, $idAutorise);
+
+        if($ok)
+        { 
+            return false;
+        }
+        $txt_req2 = "INSERT INTO tracegps_autorisations (idAutorisant, idAutorise)";
+        $txt_req2 .= " VALUES(:idAutorisant, :idAutorise)";
+    
+        $req2 = $this->cnx->prepare($txt_req2);
+
+        // liaison de la requête et de ses paramètres
+        $req2->bindValue(":idAutorisant", $idAutorisant, PDO::PARAM_INT);
+        $req2->bindValue(":idAutorise", $idAutorise, PDO::PARAM_INT);
+
+        // exécution de la requête
+        $req2->execute();
+
+        // extrait la ligne suivante
+        $resultat2 = $req2->fetch(PDO::FETCH_OBJ);
+
+        if ($resultat2) {
+        return true;
+    } 
+    else {
+        return false;
+    }
 
     
     
@@ -945,66 +1002,61 @@ class DAO
     // }
     
     
-    public function getLesPointsDeTrace($idTrace): array
-    {
+   
         /*
         * rôle : fournit la collection des points de la trace $idTrace
         * @param : $idTrace : identifiant de la trace
         * @return : collection d'objets PointDeTrace
         *           la collection des points de la trace $idTrace
         */
-       
-       
-       
-       
-       
-       
-       
-       
-        // //préparation de la requête
-        // $txt_req = "SELECT idTrace, id, latitude, longitude, altitude, dateHeure, rythmeCardio";
-        // $txt_req .= " FROM tracegps_points";
-        // $txt_req .= " WHERE idTrace = 1";
-
-        // $req = $this->cnx->prepare($txt_req);
- 
-        // // liaison de la requête et de ses paramètres
-        // $req->bindValue(":idTrace", $idTrace, PDO::PARAM_INT);
-
-        // // exécution de la requête
-        // $req->execute();
-
-        // // extrait la ligne suivante
-        // $unPoint = $req->fetch(PDO::FETCH_OBJ);
+        // Fournit la collection des points de la trace $idTrace
+// Paramètre : $idTrace (identifiant de la trace)
+// Retour : collection d'objets PointDeTrace
+public function getLesPointsDeTrace($idTrace) {
+    // Préparation de la collection à retourner
+    $lesPoints = array();
+    
+    // Préparation de la requête SQL
+    $txt_req = "SELECT * FROM tracegps_points";
+    $txt_req .= " WHERE idTrace = :idTrace";
+    $txt_req .= " ORDER BY id";
+    
+    // Préparation et exécution de la requête
+    $req = $this->cnx->prepare($txt_req);
+    $req->bindValue("idTrace", $idTrace, PDO::PARAM_INT);
+    $req->execute();
+    
+    // Parcours des résultats et création des objets PointDeTrace
+    while ($uneLigne = $req->fetch(PDO::FETCH_OBJ)) {
+        // Création d'un objet PointDeTrace
+        $unPoint = new PointDeTrace(
+            $uneLigne->idTrace,
+            $uneLigne->id,
+            $uneLigne->latitude,
+            $uneLigne->longitude,
+            $uneLigne->altitude,
+            $uneLigne->dateHeure,
+            $uneLigne->rythmeCardio,
+            $uneLigne->tempsCumule,
+            $uneLigne->distanceCumulee,
+            $uneLigne->vitesse
+        );
         
-        // // construction d'une collection d'objets Utilisateur
-        // $lesPoints = array();
-
-        // // tant qu'une ligne est trouvée :
-        // while($unPoint)
-        // {
-        //     // création d'un objet Trace
-        //     $unIdTrace = mb_convert_encoding($unPoint->idTrace, 'UTF-8', 'ISO-8859-1');
-        //     $unId = mb_convert_encoding($unPoint->id, 'UTF-8', 'ISO-8859-1');
-        //     $uneLatitude = mb_convert_encoding($unPoint->latitude, 'UTF-8', 'ISO-8859-1');
-        //     $uneLongitude = mb_convert_encoding($unPoint->longitude, 'UTF-8', 'ISO-8859-1');
-        //     $uneAltitude = mb_convert_encoding($unPoint->altitude, 'UTF-8', 'ISO-8859-1');
-        //     $uneDateHeure = mb_convert_encoding($unPoint->dateHeure, 'UTF-8', 'ISO-8859-1');
-        //     $unRythmeCardio = mb_convert_encoding($unPoint->rythmeCardio, 'UTF-8', 'ISO-8859-1');
-       
-        //     $lePoint = new Trace($unIdTrace, $unId, $uneLatitude, $uneLongitude, $uneAltitude, $uneDateHeure, $unRythmeCardio);
-        //      // ajout de l'utilisateur à la collection
-        //     $lesPoints[] = $lePoint;
-        //     // extrait la ligne suivante
-        //     $unPoint = $req->fetch(PDO::FETCH_OBJ);
-        // }
-        // // libère les ressources du jeu de données
-        // $req->closeCursor();
-
-        // // fourniture de la collection
-        // return $lesPoints;
+        // Ajout de l'objet à la collection
+        $lesPoints[] = $unPoint;
     }
     
+    // Libération des ressources
+    $req->closeCursor();
+    
+    // Retour de la collection
+    return $lesPoints;
+}
+      
+        // Fournit la collection des points de la trace $idTrace
+        // Paramètre : $idTrace (identifiant de la trace)
+        // Retour : collection d'objets PointDeTrace
+ 
     
     
     
