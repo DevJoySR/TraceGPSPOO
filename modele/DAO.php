@@ -779,25 +779,23 @@ class DAO
             */
 
 
-        $txt_req = "INSERT INTO tracegps_traces (id, dateDebut, dateFin, terminee, idUtilisateur, pseudo, nbPoints)";
-        $txt_req .= " values (:id, :dateDebut, :dateFin, :terminee, :IdUtilisateur, :pseudo, :nbPoints)";
+        $txt_req = "INSERT INTO tracegps_traces (dateDebut, dateFin, terminee, idUtilisateur)";
+        $txt_req .= " values (:dateDebut, :dateFin, :terminee, :IdUtilisateur)";
 
         $req = $this->cnx->prepare($txt_req);
        
 
         //$req->bindValue(":id", mb_convert_encoding($UneTrace->getid , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_INT);
-        $req->bindValue(":dateDebut", mb_convert_encoding($UneTrace->dateDebut, 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
+        $req->bindValue(":dateDebut",$UneTrace->getDateHeureDebut(), PDO::PARAM_STR);
         // On regarde si dateFin n'est pas null (elle l'est si la trace n'est pas terminée)
         // on le remplacera donc par null
-        if ($UneTrace->dateFin === null) {
-            $req->bindValue(":dateFin", mb_convert_encoding('UTF-8', 'ISO-8859-1'), PDO::PARAM_NULL);
+        if ($UneTrace->getDateHeureFin() === null) {
+            $req->bindValue(":dateFin", null, PDO::PARAM_NULL);
         } else {
-            $req->bindValue(":dateFin", mb_convert_encoding($UneTrace->dateFin, 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
+            $req->bindValue(":dateFin",$UneTrace->getDateHeureFin(), PDO::PARAM_STR);
         }
-        $req->bindValue(":terminee", mb_convert_encoding($UneTrace->terminee, 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
-        $req->bindValue(":IdUtilisateur", mb_convert_encoding($UneTrace->idUtilisateur , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_INT);
-        $req->bindValue(":pseudo", mb_convert_encoding($UneTrace->pseudo , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_STR);
-        $req->bindValue(":nbPoints", mb_convert_encoding($UneTrace->getLesPointsDeTrace , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_INT);
+        $req->bindValue(":terminee",$UneTrace->getTerminee(), PDO::PARAM_STR);
+        $req->bindValue(":IdUtilisateur",$UneTrace->getIdUtilisateur() , PDO::PARAM_INT);
 
         // exécution de la requête
         $ok = $req->execute();
@@ -806,6 +804,7 @@ class DAO
         
         // recherche de l'identifiant (auto_increment) qui a été attribué à la trace
         $unId = $this->cnx->lastInsertId();
+        $UneTrace->setId($unId);
         return true;
 }
 
