@@ -1087,211 +1087,73 @@ public function getLesPointsDeTrace($idTrace) {
     // Retour de la collection
     return $lesPoints;
 }
-      
-        // Fournit la collection des points de la trace $idTrace
-        // Paramètre : $idTrace (identifiant de la trace)
-        // Retour : collection d'objets PointDeTrace
- 
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+public function creerUnPointDeTrace($unPointDeTrace)
+        /*
+        * rôle : fournit la collection des points de la trace $idTrace
+        * @param : $idTrace : identifiant de la trace
+        * @return : collection d'objets PointDeTrace
+        *           la collection des points de la trace $idTrace
+        * @speciality : Si le point est le premier d'une trace ($id = 1), il faut modifier la date de début de la trace en lui
+        *               affectant la date du point
+        */
+{
+    try {
+        // Insertion du point de trace
+        $txt_req = "INSERT INTO tracegps_points 
+                    (idTrace, id, latitude, longitude, altitude, dateHeure, 
+                     rythmeCardio)
+                    VALUES (:idTrace, :id, :latitude, :longitude, :altitude, :dateHeure,
+                            :rythmeCardio)";
         
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        $req = $this->cnx->prepare($txt_req);
         
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        $req->bindValue(':idTrace', $unPointDeTrace->getIdTrace(), PDO::PARAM_INT);
+        $req->bindValue(':id', $unPointDeTrace->getId(), PDO::PARAM_INT);
+        $req->bindValue(':latitude', $unPointDeTrace->getLatitude(), PDO::PARAM_STR);
+        $req->bindValue(':longitude', $unPointDeTrace->getLongitude(), PDO::PARAM_STR);
+        $req->bindValue(':altitude', $unPointDeTrace->getAltitude(), PDO::PARAM_STR);
+        $req->bindValue(':dateHeure', $unPointDeTrace->getDateHeure(), PDO::PARAM_STR);
+        $req->bindValue(':rythmeCardio', $unPointDeTrace->getRythmeCardio(), PDO::PARAM_INT);
         
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
         
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        $ok = $req->execute();
         
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        // Si c'est le premier point de la trace (id = 1)
+        if ($ok && $unPointDeTrace->getId() == 1) {
+            // Mise à jour de la date de début de la trace
+            $txt_req2 = "UPDATE tracegps_traces 
+                        SET dateDebut = :dateDebut 
+                        WHERE id = :idTrace";
+            
+            $req2 = $this->cnx->prepare($txt_req2);
+            $req2->bindValue(':dateDebut', $unPointDeTrace->getDateHeure(), PDO::PARAM_STR);
+            $req2->bindValue(':idTrace', $unPointDeTrace->getIdTrace(), PDO::PARAM_INT);
+            $ok = $req2->execute();
+        }
         
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        return $ok;
+    }
+    catch (PDOException $e) {
+        echo "Erreur lors de la création du point de trace : " . $e->getMessage();
+        return false;
+    }
+}
    
-    // --------------------------------------------------------------------------------------
-    // début de la zone attribuée au développeur 4 (xxxxxxxxxxxxxxxxxxxx) : lignes 950 à 1150
-    // --------------------------------------------------------------------------------------
-    
-    
-    
-    
-    
-    
+public function getUneTrace($idTrace)
+        /*
+        * rôle :  fournit un objet Trace à partir de son identifiant $idTrace
+        * @param : $idTrace : l'identifiant de la trace
+        * @return : un objet
+        *           un objet de la classe Trace si $idTrace existe
+        *           l'objet null si $idTrace n'existe pas
+        * @speciality :  utiliser la méthode getLesPointsDeTrace($idTrace) pour obtenir les points de la trace et
+        *                les ajouter à l'objet Trace qui sera retourné
+        */
     
     
     
