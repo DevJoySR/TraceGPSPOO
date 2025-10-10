@@ -78,7 +78,7 @@ class PointDeTrace extends Point
 
     ############################
     ### Méthodes d'instances ###
-    ############################
+    ############################    
 
     // Fournit une chaine contenant toutes les données de l'objet
     public function toString(){
