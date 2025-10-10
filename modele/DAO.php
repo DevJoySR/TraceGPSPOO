@@ -593,7 +593,7 @@ class DAO
     else {
         return false;
     }
-
+    }
     
     
     
@@ -1012,6 +1012,7 @@ class DAO
         // Fournit la collection des points de la trace $idTrace
 // Paramètre : $idTrace (identifiant de la trace)
 // Retour : collection d'objets PointDeTrace
+
 public function getLesPointsDeTrace($idTrace) {
     // Préparation de la collection à retourner
     $lesPoints = array();
@@ -1028,6 +1029,7 @@ public function getLesPointsDeTrace($idTrace) {
     
     // Parcours des résultats et création des objets PointDeTrace
     while ($uneLigne = $req->fetch(PDO::FETCH_OBJ)) {
+        
         // Création d'un objet PointDeTrace
         $unPoint = new PointDeTrace(
             $uneLigne->idTrace,
@@ -1037,9 +1039,9 @@ public function getLesPointsDeTrace($idTrace) {
             $uneLigne->altitude,
             $uneLigne->dateHeure,
             $uneLigne->rythmeCardio,
-            $uneLigne->tempsCumule,
-            $uneLigne->distanceCumulee,
-            $uneLigne->vitesse
+            $uneLigne->tempsCumule ?? 0,
+            $uneLigne->distanceCumulee ?? 0,
+            $uneLigne->vitesse ?? 0,
         );
         
         // Ajout de l'objet à la collection
