@@ -737,8 +737,116 @@ class DAO
     // --------------------------------------------------------------------------------------
     
 
+    public function getLesTraces($idUtilisateur){
+
+
+
+        $txt_req = "SELECT tracegps_vue_utilisateurs.nbTraces";
+        $txt_req .= "(SELECT COUNT(*) FROM tracegps_traces WHERE tracegps_traces.idUtilisateur = tracegps_vue_utilisateurs.id) AS nbTraces, ";
+        $txt_req .= "FROM tracegps_vue_utilisateurs ";
+        $txt_req .= "INNER JOIN tracegps_autorisations ON tracegps_vue_utilisateurs.id = tracegps_autorisations.idAutorisant ";
+        $txt_req .= "WHERE tracegps_vue_utilisateurs.niveau = 1 AND tracegps_autorisations.idAutorise = :idUtilisateur ";
+        $txt_req .= "ORDER BY tracegps_vue_utilisateurs.pseudo";
+
+        $req = $this->cnx->prepare($txt_req);
+
+        // liaison de la requête et de ses paramètres
+        $req->bindValue(":idUtilisateur", $idUtilisateur, PDO::PARAM_INT);
+
+    }
+
+
+
+
+
+    public function creerUneTrace($UneTrace) {
+
+        /*         creerUneTrace($uneTrace)
+         @Rôle : enregistre la trace $uneTrace dans la table tracegps_traces et met à jour l'objet $uneTrace
+         avec l'identifiant (auto_increment) attribué par le SGBD
+         Paramètres à fournir :
+         $uneTrace : la trace à enregistrer
+         @Valeur de retour : un booléen
+        true si l'enregistrement s'est bien passé
+        false sinon
+        Particularités :
+        -      Si la date de fin est nulle (cas d'une trace non terminée), le champ dateFin prendra une valeur
+                nulle (PDO::PARAM_NULL) ; sinon il prendra une valeur chaine (PDO::PARAM_STR).
+        - On n'enregistre pas les points de la trace, même si l'objet $uneTrace en contient.
+
+
+        @return : true or false
+            */
+
+
+        $txt_req = "INSERT INTO tracegps_traces (dateDebut, dateFin, terminee, idUtilisateur)";
+        $txt_req .= " values (:dateDebut, :dateFin, :terminee, :IdUtilisateur)";
+
+        $req = $this->cnx->prepare($txt_req);
+       
+
+        //$req->bindValue(":id", mb_convert_encoding($UneTrace->getid , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_INT);
+        $req->bindValue(":dateDebut",$UneTrace->getDateHeureDebut(), PDO::PARAM_STR);
+        // On regarde si dateFin n'est pas null (elle l'est si la trace n'est pas terminée)
+        // on le remplacera donc par null
+        if ($UneTrace->getDateHeureFin() === null) {
+            $req->bindValue(":dateFin", null, PDO::PARAM_NULL);
+        } else {
+            $req->bindValue(":dateFin",$UneTrace->getDateHeureFin(), PDO::PARAM_STR);
+        }
+        $req->bindValue(":terminee",$UneTrace->getTerminee(), PDO::PARAM_STR);
+        $req->bindValue(":IdUtilisateur",$UneTrace->getIdUtilisateur() , PDO::PARAM_INT);
+
+        // exécution de la requête
+        $ok = $req->execute();
+        // sortir en cas d'échec
+        if ( ! $ok) { return false; }
+        
+        // recherche de l'identifiant (auto_increment) qui a été attribué à la trace
+        $unId = $this->cnx->lastInsertId();
+        $UneTrace->setId($unId);
+        return true;
+}
+
+
+
+    public function supprimerUneTrace($idTrace){
+        /*
+        @Rôle : supprime la trace d'identifiant $idTrace dans la table tracegps_traces, ainsi que tous ses points
+        dans la table tracegps_points
+        Paramètres à fournir :
+        $idTrace : l'identifiant de la trace à supprimer
+        @Valeur de retour : un booléen
+        true si la suppression s'est bien passée
+        false sinon
+        */
+
+        // préparation de la requête pour la table tracegps_points
+            $txt_req = "DELETE FROM tracegps_points" ;
+            $txt_req .= " WHERE idTrace = :idTrace";
+            $req = $this->cnx->prepare($txt_req);
+            // liaison de la requête et de ses paramètres
+            $req->bindValue("idTrace",$idTrace, PDO::PARAM_INT);
+            // exécution de la requête
+            $ok = $req->execute();
+
+
+         // préparation de la requête pour la table tracegps_traces
+            $txt_req1 = "DELETE FROM tracegps_traces" ;
+            $txt_req1 .= " WHERE id = :idTrace";
+            $req1 = $this->cnx->prepare($txt_req1);
+            $req1->bindValue("idTrace",$idTrace, PDO::PARAM_INT);
+            $ok1 = $req1->execute();
+
+            
+
+            
+        if ( ! $ok && ! $ok1) { return false; }
     
-    
+        return true;
+    }
+
+
     
     
     
@@ -1162,8 +1270,9 @@ class DAO
 
 
 
-    
+
 } // fin de la classe DAO
+
 
 // ATTENTION : on ne met pas de balise de fin de script pour ne pas prendre le risque
 // d'enregistrer d'espaces après la balise de fin de script !!!!!!!!!!!!
