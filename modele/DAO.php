@@ -1154,13 +1154,13 @@ public function getUneTrace($idTrace)
         * @speciality :  utiliser la méthode getLesPointsDeTrace($idTrace) pour obtenir les points de la trace et
         *                les ajouter à l'objet Trace qui sera retourné
         */
-    
-    
-    
-    
-    
-    
-    
+    {
+
+
+
+
+    }
+        
     
     
     
