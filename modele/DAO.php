@@ -992,28 +992,61 @@ class DAO
     // --------------------------------------------------------------------------------------
     // début de la zone attribuée au développeur 3 (Valentin Verdier) : lignes 750 à 949
     // --------------------------------------------------------------------------------------
-    
+   
     //méthode pour supprimer une autorisation
-    // public function supprimerUneAutorisation($idAutorisant, $idAutorise):bool
-    // {
-    //     if ($idAutorise === "") {
-    //     return ;
-    // }       
-    // }
+    public function supprimerUneAutorisation($idAutorisant, $idAutorise):bool
+        /*
+        *   Enregistre l'autorisation ($idAutorisant, $idAutorise) dans la table tracegps_autorisations
+        *   
+        *   Appel de la méthode autoriseAConsulter() afin de déterminer si l'autorisation a déjà été emise
+        *
+        *   @param : $idAutorisant : l'id de l'utilisateur qui autorise
+        *            $idAutorise : l'id de l'utilisateur qui est autorisé
+        *   @returns : true  si la suppression s'est bien passé false sinon
+        */
+    {
+        $dao = new DAO();
+        $ok=$dao->autoriseAConsulter($idAutorisant, $idAutorise);
+
+        if($ok)
+        { 
+            return true;
+        }
+        $txt_req2 = "DELETE FROM tracegps_autorisations (idAutorisant, idAutorise)";
+        $txt_req2 .= " VALUES(:idAutorisant, :idAutorise)";
     
+        $req2 = $this->cnx->prepare($txt_req2);
+
+        // liaison de la requête et de ses paramètres
+        $req2->bindValue(":idAutorisant", $idAutorisant, PDO::PARAM_INT);
+        $req2->bindValue(":idAutorise", $idAutorise, PDO::PARAM_INT);
+
+        // exécution de la requête
+        $req2->execute();
+
+        // extrait la ligne suivante
+        $resultat2 = $req2->fetch(PDO::FETCH_OBJ);
+
+        if ($resultat2) 
+        {
+        return true;
+        } 
+        else 
+        {
+        return false;
+        }
+    }
     
    
+        
+public function getLesPointsDeTrace($idTrace) {
         /*
         * rôle : fournit la collection des points de la trace $idTrace
         * @param : $idTrace : identifiant de la trace
         * @return : collection d'objets PointDeTrace
         *           la collection des points de la trace $idTrace
         */
-        // Fournit la collection des points de la trace $idTrace
-// Paramètre : $idTrace (identifiant de la trace)
-// Retour : collection d'objets PointDeTrace
 
-public function getLesPointsDeTrace($idTrace) {
     // Préparation de la collection à retourner
     $lesPoints = array();
     
