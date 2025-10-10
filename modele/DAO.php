@@ -808,6 +808,45 @@ class DAO
         return true;
 }
 
+
+
+    public function supprimerUneTrace($idTrace){
+        /*
+        @Rôle : supprime la trace d'identifiant $idTrace dans la table tracegps_traces, ainsi que tous ses points
+        dans la table tracegps_points
+        Paramètres à fournir :
+        $idTrace : l'identifiant de la trace à supprimer
+        @Valeur de retour : un booléen
+        true si la suppression s'est bien passée
+        false sinon
+        */
+
+        // préparation de la requête pour la table tracegps_points
+            $txt_req = "DELETE FROM tracegps_points" ;
+            $txt_req .= " WHERE idTrace = :idTrace";
+            $req = $this->cnx->prepare($txt_req);
+            // liaison de la requête et de ses paramètres
+            $req->bindValue("idTrace",$idTrace, PDO::PARAM_INT);
+            // exécution de la requête
+            $ok = $req->execute();
+
+
+         // préparation de la requête pour la table tracegps_traces
+            $txt_req1 = "DELETE FROM tracegps_traces" ;
+            $txt_req1 .= " WHERE id = :idTrace";
+            $req1 = $this->cnx->prepare($txt_req1);
+            $req1->bindValue("idTrace",$idTrace, PDO::PARAM_INT);
+            $ok1 = $req1->execute();
+
+            
+
+            
+        if ( ! $ok && ! $ok1) { return false; }
+    
+        return true;
+    }
+
+
     
     
     
