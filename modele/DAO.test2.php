@@ -85,6 +85,18 @@ echo "<h4>l'objet laTrace après l'appel de la méthode terminerUneTrace : </h4>
 echo ($laTrace->toString());
 echo ('<br>');
 
+// test de la méthode getLesTraces($idUtilisateur) ------------------------------------------------
+// modifié par dP le 14/8/2021
+echo "<h3>Test de getLesTraces(idUtilisateur) : </h3>";
+$lesTraces = $dao->getLesTraces(2);
+$nbReponses = sizeof($lesTraces);
+echo "<p>Nombre de traces de l'utilisateur 2 : " . $nbReponses . "</p>";
+// affichage des traces
+foreach ($lesTraces as $uneTrace)
+{ echo ($uneTrace->toString());
+ echo ('<br>');
+}
+
 
 
 

@@ -929,36 +929,43 @@ class DAO
         @Valeur de retour : une collection d'objet Trace
         */
         {
-            $txt_req = "SELECT id, terminee, dateDebut, dateFin" ;
-            $txt_req .= "FROM tracegps_traces" ;
+            $txt_req = "SELECT id, idUtilisateur, terminee, dateDebut, dateFin" ;
+            $txt_req .= " FROM tracegps_traces" ;
             $txt_req .= " WHERE idUtilisateur = :idUtilisateur";
+            $txt_req .= " ORDER BY id DESC";
 
             $req = $this->cnx->prepare($txt_req);
             // liaison de la requête et de ses paramètres
-            $req->bindValue("idUtilisateur",$idUtilisateur, PDO::PARAM_INT);
+            $req->bindValue(":idUtilisateur",$idUtilisateur, PDO::PARAM_INT);
             // exécution de la requête
             $req->execute();
-            $lesTraces = array();
+            $lesTraces = [];
             
             // Parcours des résultats et création des objets PointDeTrace
     while ($uneLigne = $req->fetch(PDO::FETCH_OBJ)) {
         
         // Création d'un objet PointDeTrace
-            $unPoint = new Trace(
+            $uneTrace = new Trace(
             $uneLigne->id,
             $uneLigne->dateDebut,
             $uneLigne->dateFin,
             $uneLigne->terminee,
-
+            $uneLigne->idUtilisateur
         );
-        
-        // Ajout de l'objet à la collection
-        $lesTraces[] = $unPoint;
-        
-    }
-    return $lesTraces;
+         
+            // Récupérer et ajouter les points de la trace
+            $lesPoints = $this->getLesPointsDeTrace($uneTrace->getId());
+            foreach ($lesPoints as $unPoint) {
+                 $uneTrace->ajouterPoint($unPoint);
+            }
+         // Ajout de l'objet à la collection
+        $lesTraces[] = $uneTrace;
+        }// fin while
 
-        }
+$req->closeCursor();    
+return $lesTraces;
+
+    }
     
     
 
