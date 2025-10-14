@@ -504,7 +504,7 @@ class DAO
 
     public function autoriseAConsulter($idAutorisant, $idAutorise)
     /*
-    *    Indique si l'utilisateur $idAutorisant autorise l'utilisateur $idAutorise à consulter ses traces
+    *   Indique si l'utilisateur $idAutorisant autorise l'utilisateur $idAutorise à consulter ses traces
     *   
     *   @param : $idAutorisant : l'id de l'utilisateur qui autorise
     *            $idAutorise : l'id de l'utilisateur qui est autorisé
@@ -535,8 +535,65 @@ class DAO
     }
 }
 
+    public function creerUneAutorisation($idAutorisant, $idAutorise)
+    /*
+    *   Enregistre l'autorisation ($idAutorisant, $idAutorise) dans la table tracegps_autorisations
+    *   
+    *   Appel de la méthode autoriseAConsulter() afin de déterminer si l'autorisation a déjà été emise
+    *
+    *   @param : $idAutorisant : l'id de l'utilisateur qui autorise
+    *            $idAutorise : l'id de l'utilisateur qui est autorisé
+    *   @returns : true  si l'enregistrement s'est bien passé false sinon
+    */
+    {
+        // // préparation de la requête de recherche
+        // $txt_req = "SELECT COUNT(*) AS nb FROM tracegps_autorisations";
+        // $txt_req .= " WHERE idAutorisant = :idAutorisant AND idAutorise = :idAutorise";
+        // $req = $this->cnx->prepare($txt_req);
 
+        // // liaison de la requête et de ses paramètres
+        // $req->bindValue(":idAutorisant", $idAutorisant, PDO::PARAM_INT);
+        // $req->bindValue(":idAutorise", $idAutorise, PDO::PARAM_INT);
 
+        // // exécution de la requête
+        // $req->execute();
+
+        // // extrait la ligne suivante
+        // $resultat = $req->fetch(PDO::FETCH_OBJ);
+
+        // if ($resultat && $resultat->nb > 0) {
+        //     return false;
+        // }
+        
+        $dao = new DAO();
+        $ok=$dao->autoriseAConsulter($idAutorisant, $idAutorise);
+
+        if($ok)
+        { 
+            return false;
+        }
+        $txt_req2 = "INSERT INTO tracegps_autorisations (idAutorisant, idAutorise)";
+        $txt_req2 .= " VALUES(:idAutorisant, :idAutorise)";
+    
+        $req2 = $this->cnx->prepare($txt_req2);
+
+        // liaison de la requête et de ses paramètres
+        $req2->bindValue(":idAutorisant", $idAutorisant, PDO::PARAM_INT);
+        $req2->bindValue(":idAutorise", $idAutorise, PDO::PARAM_INT);
+
+        // exécution de la requête
+        $req2->execute();
+
+        // extrait la ligne suivante
+        $resultat2 = $req2->fetch(PDO::FETCH_OBJ);
+
+        if ($resultat2) {
+        return true;
+    } 
+    else {
+        return false;
+    }
+    }
     
     
     
@@ -1127,233 +1184,211 @@ class DAO
     // --------------------------------------------------------------------------------------
     // début de la zone attribuée au développeur 3 (Valentin Verdier) : lignes 750 à 949
     // --------------------------------------------------------------------------------------
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+   
+    //méthode pour supprimer une autorisation
+    public function supprimerUneAutorisation($idAutorisant, $idAutorise):bool
+        /*
+        *   Enregistre l'autorisation ($idAutorisant, $idAutorise) dans la table tracegps_autorisations
+        *   
+        *   Appel de la méthode autoriseAConsulter() afin de déterminer si l'autorisation a déjà été emise
+        *
+        *   @param : $idAutorisant : l'id de l'utilisateur qui autorise
+        *            $idAutorise : l'id de l'utilisateur qui est autorisé
+        *   @returns : true  si la suppression s'est bien passé false sinon
+        */
+    {
+        $dao = new DAO();
+        $ok=$dao->autoriseAConsulter($idAutorisant, $idAutorise);
+
+        if($ok)
+        { 
+            return true;
+        }
+        $txt_req2 = "DELETE FROM tracegps_autorisations (idAutorisant, idAutorise)";
+        $txt_req2 .= " VALUES(:idAutorisant, :idAutorise)";
+    
+        $req2 = $this->cnx->prepare($txt_req2);
+
+        // liaison de la requête et de ses paramètres
+        $req2->bindValue(":idAutorisant", $idAutorisant, PDO::PARAM_INT);
+        $req2->bindValue(":idAutorise", $idAutorise, PDO::PARAM_INT);
+
+        // exécution de la requête
+        $req2->execute();
+
+        // extrait la ligne suivante
+        $resultat2 = $req2->fetch(PDO::FETCH_OBJ);
+
+        if ($resultat2) 
+        {
+        return true;
+        } 
+        else 
+        {
+        return false;
+        }
+    }
     
    
-    // --------------------------------------------------------------------------------------
-    // début de la zone attribuée au développeur 4 (xxxxxxxxxxxxxxxxxxxx) : lignes 950 à 1150
-    // --------------------------------------------------------------------------------------
+        
+public function getLesPointsDeTrace($idTrace) 
+        /*
+        * rôle : fournit la collection des points de la trace $idTrace
+        * @param : $idTrace : identifiant de la trace
+        * @return : collection d'objets PointDeTrace
+        *           la collection des points de la trace $idTrace
+        */
+{
+    // Préparation de la collection à retourner
+    $lesPoints = array();
     
+    // Préparation de la requête SQL
+    $txt_req = "SELECT * FROM tracegps_points";
+    $txt_req .= " WHERE idTrace = :idTrace";
+    $txt_req .= " ORDER BY id";
     
+    // Préparation et exécution de la requête
+    $req = $this->cnx->prepare($txt_req);
+    $req->bindValue("idTrace", $idTrace, PDO::PARAM_INT);
+    $req->execute();
     
+    // Parcours des résultats et création des objets PointDeTrace
+    while ($uneLigne = $req->fetch(PDO::FETCH_OBJ)) {
+        
+        // Création d'un objet PointDeTrace
+        $unPoint = new PointDeTrace(
+            $uneLigne->idTrace,
+            $uneLigne->id,
+            $uneLigne->latitude,
+            $uneLigne->longitude,
+            $uneLigne->altitude,
+            $uneLigne->dateHeure,
+            $uneLigne->rythmeCardio,
+            $uneLigne->tempsCumule ?? 0,
+            $uneLigne->distanceCumulee ?? 0,
+            $uneLigne->vitesse ?? 0,
+        );
+        
+        // Ajout de l'objet à la collection
+        $lesPoints[] = $unPoint;
+    }
     
+    // Libération des ressources
+    $req->closeCursor();
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    // Retour de la collection
+    return $lesPoints;
+}
 
 
 
+
+
+public function creerUnPointDeTrace($unPointDeTrace)
+        /*
+        * rôle : fournit la collection des points de la trace $idTrace
+        * @param : $idTrace : identifiant de la trace
+        * @return : collection d'objets PointDeTrace
+        *           la collection des points de la trace $idTrace
+        * @speciality : Si le point est le premier d'une trace ($id = 1), il faut modifier la date de début de la trace en lui
+        *               affectant la date du point
+        */
+{
+    try {
+        
+        // Insertion du point de trace
+        $txt_req = "INSERT INTO tracegps_points 
+                    (idTrace, id, latitude, longitude, altitude, dateHeure, 
+                     rythmeCardio)
+                    VALUES (:idTrace, :id, :latitude, :longitude, :altitude, :dateHeure,
+                            :rythmeCardio)";
+        
+        $req = $this->cnx->prepare($txt_req);
+        
+        $req->bindValue(':idTrace', $unPointDeTrace->getIdTrace(), PDO::PARAM_INT);
+        $req->bindValue(':id', $unPointDeTrace->getId(), PDO::PARAM_INT);
+        $req->bindValue(':latitude', $unPointDeTrace->getLatitude(), PDO::PARAM_STR);
+        $req->bindValue(':longitude', $unPointDeTrace->getLongitude(), PDO::PARAM_STR);
+        $req->bindValue(':altitude', $unPointDeTrace->getAltitude(), PDO::PARAM_STR);
+        $req->bindValue(':dateHeure', $unPointDeTrace->getDateHeure(), PDO::PARAM_STR);
+        $req->bindValue(':rythmeCardio', $unPointDeTrace->getRythmeCardio(), PDO::PARAM_INT);
+        
+        
+        $ok = $req->execute();
+        
+        // Si c'est le premier point de la trace (id = 1)
+        if ($ok && $unPointDeTrace->getId() == 1) {
+            // Mise à jour de la date de début de la trace
+            $txt_req2 = "UPDATE tracegps_traces 
+                        SET dateDebut = :dateDebut 
+                        WHERE id = :idTrace";
+            
+            $req2 = $this->cnx->prepare($txt_req2);
+            $req2->bindValue(':dateDebut', $unPointDeTrace->getDateHeure(), PDO::PARAM_STR);
+            $req2->bindValue(':idTrace', $unPointDeTrace->getIdTrace(), PDO::PARAM_INT);
+            $ok = $req2->execute();
+        }
+        
+        return $ok;
+    }
+    catch (PDOException $e) {
+        echo "Erreur lors de la création du point de trace : " . $e->getMessage();
+        return false;
+    }
+}
+   
+public function getUneTrace($idTrace)
+        /*
+        * rôle :  fournit un objet Trace à partir de son identifiant $idTrace
+        * @param : $idTrace : l'identifiant de la trace
+        * @return : un objet de la classe Trace si $idTrace existe 
+        *           l'objet null si $idTrace n'existe pas
+        * @speciality :  utiliser la méthode getLesPointsDeTrace($idTrace) pour obtenir les points de la trace et
+        *                les ajouter à l'objet Trace qui sera retourné
+        */
+    {
+    // Requête pour récupérer les données de base de la trace
+    $txt_req = "SELECT id, dateDebut, dateFin, terminee, idUtilisateur ";
+    $txt_req .= "FROM tracegps_traces WHERE id = :idTrace";
+    
+    $req = $this->cnx->prepare($txt_req);
+    $req->bindValue("idTrace", $idTrace, PDO::PARAM_INT);
+    $req->execute();
+    
+    $ligne = $req->fetch(PDO::FETCH_OBJ);
+    
+    // Si la trace n'existe pas, retourner null
+    if (!$ligne) {
+        return null;
+    }
+    
+    // Créer l'objet Trace avec les données de base
+    $uneTrace = new Trace(
+        $ligne->id,
+        $ligne->dateDebut,
+        $ligne->dateFin,
+        $ligne->terminee,
+        $ligne->idUtilisateur
+    );
+    
+    // Récupérer et ajouter les points de la trace
+    $lesPoints = $this->getLesPointsDeTrace($idTrace);
+    foreach ($lesPoints as $unPoint) {
+        $uneTrace->ajouterPoint($unPoint);
+    }
+    
+    return $uneTrace;
+}
+
+        
+    
+    
+    
+    
+    
+    
+    
+    
 
 } // fin de la classe DAO
 
