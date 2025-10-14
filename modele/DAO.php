@@ -1271,20 +1271,20 @@ public function getUneTrace($idTrace)
     $req->bindValue("idTrace", $idTrace, PDO::PARAM_INT);
     $req->execute();
     
-    $ligne = $req->fetch(PDO::FETCH_OBJ);
+    $uneLigne = $req->fetch(PDO::FETCH_OBJ);
     
     // Si la trace n'existe pas, retourner null
-    if (!$ligne) {
+    if (!$uneLigne) {
         return null;
     }
     
     // Créer l'objet Trace avec les données de base
     $uneTrace = new Trace(
-        $ligne->id,
-        $ligne->dateDebut,
-        $ligne->dateFin,
-        $ligne->terminee,
-        $ligne->idUtilisateur
+        $uneLigne->id,
+        $uneLigne->dateDebut,
+        $uneLigne->dateFin,
+        $uneLigne->terminee,
+        $uneLigne->idUtilisateur
     );
     
     // Récupérer et ajouter les points de la trace
@@ -1296,9 +1296,53 @@ public function getUneTrace($idTrace)
     return $uneTrace;
 }
 
+
+public function getToutesLesTraces()
+    /*
+    * rôle :  fournit la collection de toutes les traces
+    * @param : aucun
+    * @return : une collection d'objets Trace
+    * @speciality : utiliser la méthode getLesPointsDeTrace($idTrace) pour obtenir les points de chaque
+    *               trace et les ajouter à chaque objet Trace qui sera ajouté à la collection
+    */
+    {
+        // Requête pour récupérer toutes les traces
+        $txt_req = "SELECT id, dateDebut, dateFin, terminee, idUtilisateur ";
+        $txt_req .= "FROM tracegps_traces ";
+        $txt_req .= "ORDER BY id DESC";
         
+        $req = $this->cnx->prepare($txt_req);
+        $req->execute();
+        
+        $lesLignes = $req->fetchAll(PDO::FETCH_OBJ);
+        
+        // Création de la collection de traces
+        $lesTraces = array();
+        
+        // Parcourir chaque ligne et créer un objet Trace
+        foreach ($lesLignes as $ligne) {
+            // Créer l'objet Trace avec les données de base
+            $uneTrace = new Trace(
+                $ligne->id,
+                $ligne->dateDebut,
+                $ligne->dateFin,
+                $ligne->terminee,
+                $ligne->idUtilisateur
+            );
+            
+            // Récupérer et ajouter les points de la trace
+            $lesPoints = $this->getLesPointsDeTrace($ligne->id);
+            foreach ($lesPoints as $unPoint) {
+                $uneTrace->ajouterPoint($unPoint);
+            }
+            
+            // Ajouter la trace à la collection
+            $lesTraces[] = $uneTrace;
+        }
     
-    
+    return $lesTraces;
+}
+
     
     
     
