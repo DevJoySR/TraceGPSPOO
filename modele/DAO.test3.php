@@ -34,7 +34,6 @@ $dao = new DAO();
 // test de la méthode xxxxxxxxxxxxxxxxxxxxxxxxxxx ----------------------------------------------------------
 // modifié par xxxxxxxxxxxxxxxxx le xxxxxxxxxx
 echo "<h3>Test de Valentin : </h3>";
-// A CONTINUER .........
 
 // test de la méthode supprimerUneAutorisation ----------------------------------------------------
 // modifié par dP le 13/8/2021

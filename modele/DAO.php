@@ -1211,6 +1211,7 @@ public function creerUnPointDeTrace($unPointDeTrace)
         */
 {
     try {
+        
         // Insertion du point de trace
         $txt_req = "INSERT INTO tracegps_points 
                     (idTrace, id, latitude, longitude, altitude, dateHeure, 
@@ -1262,13 +1263,39 @@ public function getUneTrace($idTrace)
         *                les ajouter à l'objet Trace qui sera retourné
         */
     {
-        if ($this->getLesPointsDeTrace($idTrace == 0)) 
-        {
+    // Requête pour récupérer les données de base de la trace
+    $txt_req = "SELECT id, dateDebut, dateFin, terminee, idUtilisateur ";
+    $txt_req .= "FROM tracegps_traces WHERE id = :idTrace";
+    
+    $req = $this->cnx->prepare($txt_req);
+    $req->bindValue("idTrace", $idTrace, PDO::PARAM_INT);
+    $req->execute();
+    
+    $ligne = $req->fetch(PDO::FETCH_OBJ);
+    
+    // Si la trace n'existe pas, retourner null
+    if (!$ligne) {
         return null;
-        }
-        else 
-        return $Trace;
     }
+    
+    // Créer l'objet Trace avec les données de base
+    $uneTrace = new Trace(
+        $ligne->id,
+        $ligne->dateDebut,
+        $ligne->dateFin,
+        $ligne->terminee,
+        $ligne->idUtilisateur
+    );
+    
+    // Récupérer et ajouter les points de la trace
+    $lesPoints = $this->getLesPointsDeTrace($idTrace);
+    foreach ($lesPoints as $unPoint) {
+        $uneTrace->ajouterPoint($unPoint);
+    }
+    
+    return $uneTrace;
+}
+
         
     
     
@@ -1278,12 +1305,6 @@ public function getUneTrace($idTrace)
     
     
     
-    
-    
-    
-
-
-
 
 } // fin de la classe DAO
 
