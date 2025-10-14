@@ -958,7 +958,7 @@ class DAO
         *   @speciality :  utiliser la méthode getLesPointsDeTrace($idTrace) pour obtenir les points de chaque 
         *                  trace et les ajouter à chaque objet Trace qui sera ajouté à la collection
         */
-        
+
         {
             $txt_req = "SELECT id, terminee, dateDebut, dateFin" ;
             $txt_req .= "FROM tracegps_traces" ;
@@ -1224,7 +1224,7 @@ class DAO
         
 public function getLesPointsDeTrace($idTrace) 
         /*
-        * rôle : fournit la collection des points de la trace $idTrace
+        * Fournit la collection des points de la trace $idTrace
         * @param : $idTrace : identifiant de la trace
         * @return : collection d'objets PointDeTrace
         *           la collection des points de la trace $idTrace
@@ -1277,7 +1277,7 @@ public function getLesPointsDeTrace($idTrace)
 
 public function creerUnPointDeTrace($unPointDeTrace)
         /*
-        * rôle : fournit la collection des points de la trace $idTrace
+        * Fournit la collection des points de la trace $idTrace
         * @param : $idTrace : identifiant de la trace
         * @return : collection d'objets PointDeTrace
         *           la collection des points de la trace $idTrace
@@ -1330,7 +1330,7 @@ public function creerUnPointDeTrace($unPointDeTrace)
    
 public function getUneTrace($idTrace)
         /*
-        * rôle :  fournit un objet Trace à partir de son identifiant $idTrace
+        * Fournit un objet Trace à partir de son identifiant $idTrace
         * @param : $idTrace : l'identifiant de la trace
         * @return : un objet de la classe Trace si $idTrace existe 
         *           l'objet null si $idTrace n'existe pas
