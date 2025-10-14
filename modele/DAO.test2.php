@@ -67,6 +67,24 @@ else {
  echo "<p>Echec lors de la suppression de la trace !</p>";
 }
 
+// test des méthodes creerUnPointDeTrace et terminerUneTrace --------------------------------------
+// modifié par dP le 15/8/2021
+echo "<h3>Test de terminerUneTrace : </h3>";
+// on choisit une trace non terminée
+$unIdTrace = 3;
+// on l'affiche
+$laTrace = $dao->getUneTrace($unIdTrace);
+echo "<h4>l'objet laTrace avant l'appel de la méthode terminerUneTrace : </h4>";
+echo ($laTrace->toString());
+echo ('<br>');
+// on la termine
+$dao->terminerUneTrace($unIdTrace);
+// et on l'affiche à nouveau
+$laTrace = $dao->getUneTrace($unIdTrace);
+echo "<h4>l'objet laTrace après l'appel de la méthode terminerUneTrace : </h4>";
+echo ($laTrace->toString());
+echo ('<br>');
+
 
 
 
