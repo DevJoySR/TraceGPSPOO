@@ -794,10 +794,15 @@ class DAO
     // --------------------------------------------------------------------------------------
     
 
-    public function getLesTraces($idUtilisateur){
-
-
-
+    public function getLesTraces($idUtilisateur)
+        /*         
+        *   Fournit la collection des traces de l'utilisateur $idUtilisateu
+        *   @param  : $idUtilisateur : identifiant de l'utilisateur dont on veut obtenir les traces
+        *   @returns : une collection d'objets Trace
+        *   @speciality : utiliser la méthode getLesPointsDeTrace($idTrace) pour obtenir les points de chaque 
+        *                 trace et les ajouter à chaque objet Trace qui sera ajouté à la collection
+        */
+        {
         $txt_req = "SELECT tracegps_vue_utilisateurs.nbTraces";
         $txt_req .= "(SELECT COUNT(*) FROM tracegps_traces WHERE tracegps_traces.idUtilisateur = tracegps_vue_utilisateurs.id) AS nbTraces, ";
         $txt_req .= "FROM tracegps_vue_utilisateurs ";
@@ -812,30 +817,17 @@ class DAO
 
     }
 
+    public function creerUneTrace($uneTrace) 
 
-
-
-
-    public function creerUneTrace($UneTrace) {
-
-        /*         creerUneTrace($uneTrace)
-         @Rôle : enregistre la trace $uneTrace dans la table tracegps_traces et met à jour l'objet $uneTrace
-         avec l'identifiant (auto_increment) attribué par le SGBD
-         Paramètres à fournir :
-         $uneTrace : la trace à enregistrer
-         @Valeur de retour : un booléen
-        true si l'enregistrement s'est bien passé
-        false sinon
-        Particularités :
-        -      Si la date de fin est nulle (cas d'une trace non terminée), le champ dateFin prendra une valeur
-                nulle (PDO::PARAM_NULL) ; sinon il prendra une valeur chaine (PDO::PARAM_STR).
-        - On n'enregistre pas les points de la trace, même si l'objet $uneTrace en contient.
-
-
-        @return : true or false
-            */
-
-
+        /*         
+        *   Enregistre la trace $uneTrace dans la table tracegps_traces et met à jour l'objet $uneTrace avec l'identifiant (auto_increment) attribué par le SGBD
+        *   @param  : $uneTrace : la trace à enregistrer
+        *   @returns : true si l'enregistrement s'est bien passé false sinon
+        *   @speciality : Si la date de fin est nulle (cas d'une trace non terminée), le champ dateFin prendra une valeur
+        *                 nulle (PDO::PARAM_NULL) ; sinon il prendra une valeur chaine (PDO::PARAM_STR).
+        *                 On n'enregistre pas les points de la trace, même si l'objet $uneTrace en contient.
+        */
+{
         $txt_req = "INSERT INTO tracegps_traces (dateDebut, dateFin, terminee, idUtilisateur)";
         $txt_req .= " values (:dateDebut, :dateFin, :terminee, :IdUtilisateur)";
 
@@ -843,16 +835,16 @@ class DAO
        
 
         //$req->bindValue(":id", mb_convert_encoding($UneTrace->getid , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_INT);
-        $req->bindValue(":dateDebut",$UneTrace->getDateHeureDebut(), PDO::PARAM_STR);
+        $req->bindValue(":dateDebut",$uneTrace->getDateHeureDebut(), PDO::PARAM_STR);
         // On regarde si dateFin n'est pas null (elle l'est si la trace n'est pas terminée)
         // on le remplacera donc par null
-        if ($UneTrace->getDateHeureFin() === null) {
+        if ($uneTrace->getDateHeureFin() === null) {
             $req->bindValue(":dateFin", null, PDO::PARAM_NULL);
         } else {
-            $req->bindValue(":dateFin",$UneTrace->getDateHeureFin(), PDO::PARAM_STR);
+            $req->bindValue(":dateFin",$uneTrace->getDateHeureFin(), PDO::PARAM_STR);
         }
-        $req->bindValue(":terminee",$UneTrace->getTerminee(), PDO::PARAM_STR);
-        $req->bindValue(":IdUtilisateur",$UneTrace->getIdUtilisateur() , PDO::PARAM_INT);
+        $req->bindValue(":terminee",$uneTrace->getTerminee(), PDO::PARAM_STR);
+        $req->bindValue(":IdUtilisateur",$uneTrace->getIdUtilisateur() , PDO::PARAM_INT);
 
         // exécution de la requête
         $ok = $req->execute();
@@ -861,23 +853,19 @@ class DAO
         
         // recherche de l'identifiant (auto_increment) qui a été attribué à la trace
         $unId = $this->cnx->lastInsertId();
-        $UneTrace->setId($unId);
+        $uneTrace->setId($unId);
         return true;
 }
 
 
 
-    public function supprimerUneTrace($idTrace){
-        /*
-        @Rôle : supprime la trace d'identifiant $idTrace dans la table tracegps_traces, ainsi que tous ses points
-        dans la table tracegps_points
-        Paramètres à fournir :
-        $idTrace : l'identifiant de la trace à supprimer
-        @Valeur de retour : un booléen
-        true si la suppression s'est bien passée
-        false sinon
+    public function supprimerUneTrace($idTrace)
+        /*         
+        *   Supprime la trace d'identifiant $idTrace dans la table tracegps_traces, ainsi que tous ses points
+        *   @param  : $idTrace : l'identifiant de la trace à supprimer
+        *   @returns : rue si la suppression s'est bien passée false sinon
         */
-
+    {
         // préparation de la requête pour la table tracegps_points
             $txt_req = "DELETE FROM tracegps_points" ;
             $txt_req .= " WHERE idTrace = :idTrace";
@@ -902,6 +890,93 @@ class DAO
     
         return true;
     }
+
+    public function terminerUneTrace($idTrace)
+
+        /*         
+        *   Enregistre la fin de la trace d'identifiant $idTrace dans la table tracegps_traces ainsi que la date de fin
+        *   @param  : $idTrace : l'identifiant de la trace à terminer
+        *   @returns : true si la modification s'est bien passée false sinon
+        *   @speciality : Le champ terminee doit être mis à 1
+        *                 Le champ dateFin doit prendre comme valeur la date du dernier point de la trace (si la trace 
+        *                 contient des points) ou la date système (si la trace ne contient aucun point)
+        */
+
+        {
+        $txt_req = "UPDATE tracegps_traces (terminee, dateFin)";
+        $txt_req .= " values (:terminee, :dateFin)";
+        $txt_req .= " WHERE id = :idTrace";
+
+        $req = $this->cnx->prepare($txt_req);
+       
+        // on met terminee a 1 pour dire que la trace est terminer
+        $req->bindValue(":terminee",1, PDO::PARAM_STR);
+        $req->bindValue(":idTrace",$idTrace, PDO::PARAM_STR);
+        // on récupère le dernier dateFin
+        if ( $idTrace->getLesPointsDeTrace() = 0) {
+
+            $req->bindValue(":dateFin",date('Y-m-d H:i:s'), PDO::PARAM_INT);
+        }
+        else
+            {
+
+            // préparation de la requête de recherche
+            $txt_req2 = "Select dateHeure";
+            $txt_req2 .= " from tracegps_points";
+            $txt_req2 .= " where idTrace = :idTrace";
+            $txt_req2 .= " ORDER BY id DESC";
+            $txt_req2 .= " LIMIT 1;";
+            $req2 = $this->cnx->prepare($txt_req);
+            // liaison de la requête et de ses paramètres
+            $req2->bindValue(":idTrace", $idTrace, PDO::PARAM_STR);
+            // extraction des données
+            $req2->execute();
+            $dateFin = $req2->fetch(PDO::FETCH_OBJ);
+            // libère les ressources du jeu de données
+            $req2->closeCursor();
+            $req->bindValue(":terminee",$dateFin, PDO::PARAM_STR);
+
+            }
+
+        // exécution de la requête
+        $ok = $req->execute();
+        // sortir en cas d'échec
+        if ( ! $ok) { return false; }
+        
+        return true;
+
+        } // fin de la fonction
+
+
+
+        public function getLesTraces($idUtilisateur)
+
+        /*         
+        *   Fournit la collection des traces d'un utilisateurs
+        *   @param  : $idUtilisateur : identifiant de l'utilisateur dont on veut obtenir les traces
+        *   @returns :  une collection d'objets Trace
+        *   @speciality :  utiliser la méthode getLesPointsDeTrace($idTrace) pour obtenir les points de chaque 
+        *                  trace et les ajouter à chaque objet Trace qui sera ajouté à la collection
+        */
+
+        {
+            $txt_req = "SELECT id, terminee, dateDebut, dateFin" ;
+            $txt_req .= "FROM tracegps_traces" ;
+            $txt_req .= " WHERE idUtilisateur = :idUtilisateur";
+
+            $req = $this->cnx->prepare($txt_req);
+            // liaison de la requête et de ses paramètres
+            $req->bindValue("idUtilisateur",$idUtilisateur, PDO::PARAM_INT);
+            // exécution de la requête
+            $req->execute();
+            
+            while ($uneLigne = $req->fetch(PDO::FETCH_OBJ)) {
+                $idTrace = mb_convert_encoding($uneLigne->id, 'UTF-8', 'ISO-8859-1');
+                getLesPointsDeTrace($idTrace);
+
+        }
+    }
+    
 
 
     
@@ -1149,7 +1224,7 @@ class DAO
         
 public function getLesPointsDeTrace($idTrace) 
         /*
-        * rôle : fournit la collection des points de la trace $idTrace
+        * Fournit la collection des points de la trace $idTrace
         * @param : $idTrace : identifiant de la trace
         * @return : collection d'objets PointDeTrace
         *           la collection des points de la trace $idTrace
@@ -1202,7 +1277,7 @@ public function getLesPointsDeTrace($idTrace)
 
 public function creerUnPointDeTrace($unPointDeTrace)
         /*
-        * rôle : fournit la collection des points de la trace $idTrace
+        * Fournit la collection des points de la trace $idTrace
         * @param : $idTrace : identifiant de la trace
         * @return : collection d'objets PointDeTrace
         *           la collection des points de la trace $idTrace
@@ -1255,7 +1330,7 @@ public function creerUnPointDeTrace($unPointDeTrace)
    
 public function getUneTrace($idTrace)
         /*
-        * rôle :  fournit un objet Trace à partir de son identifiant $idTrace
+        * Fournit un objet Trace à partir de son identifiant $idTrace
         * @param : $idTrace : l'identifiant de la trace
         * @return : un objet de la classe Trace si $idTrace existe 
         *           l'objet null si $idTrace n'existe pas
