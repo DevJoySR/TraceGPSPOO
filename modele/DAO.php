@@ -965,7 +965,64 @@ class DAO
 $req->closeCursor();    
 return $lesTraces;
 
+}
+
+
+
+public function getLesTracesAutorisees($idUtilisateur): array
+{
+    /*
+    @Rôle : Fournit la collection des traces de l'utilisateur 
+            qui ont été autorisées à au moins un autre utilisateur
+    Paramètres à fournir :
+    $idUtilisateur : l'identifiant de l'utilisateur
+    @Valeur de retour : une collection d'objets Trace
+    */
+    
+    $txt_req = "SELECT t.*
+                FROM tracegps_traces t
+                JOIN tracegps_utilisateurs u ON u.id = t.idUtilisateur
+                WHERE (t.idUtilisateur = :idUtilisateur
+                       OR EXISTS (
+                           SELECT 1 FROM tracegps_autorisations a
+                           WHERE a.idAutorisant = t.idUtilisateur
+                             AND a.idAutorise = :idUtilisateur
+                       )
+                )
+                AND u.niveau = 1
+                ORDER BY t.id DESC;";
+ 
+
+    $req = $this->cnx->prepare($txt_req);
+    $req->bindValue(":idUtilisateur", $idUtilisateur, PDO::PARAM_INT);
+    $req->execute();
+    
+    $lesTraces = [];
+
+    while ($uneLigne = $req->fetch(PDO::FETCH_OBJ)) {
+        $uneTrace = new Trace(
+            $uneLigne->id,
+            $uneLigne->dateDebut,
+            $uneLigne->dateFin,
+            $uneLigne->terminee,
+            $uneLigne->idUtilisateur
+        );
+
+        // Récupérer et ajouter les points de la trace
+        $lesPoints = $this->getLesPointsDeTrace($uneTrace->getId());
+        foreach ($lesPoints as $unPoint) {
+            $uneTrace->ajouterPoint($unPoint);
+        }
+        
+        $lesTraces[] = $uneTrace;
     }
+
+    $req->closeCursor();    
+    return $lesTraces;
+}
+
+
+
     
     
 
