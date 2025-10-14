@@ -1039,14 +1039,14 @@ class DAO
     
    
         
-public function getLesPointsDeTrace($idTrace) {
+public function getLesPointsDeTrace($idTrace) 
         /*
         * rôle : fournit la collection des points de la trace $idTrace
         * @param : $idTrace : identifiant de la trace
         * @return : collection d'objets PointDeTrace
         *           la collection des points de la trace $idTrace
         */
-
+{
     // Préparation de la collection à retourner
     $lesPoints = array();
     
@@ -1148,17 +1148,18 @@ public function getUneTrace($idTrace)
         /*
         * rôle :  fournit un objet Trace à partir de son identifiant $idTrace
         * @param : $idTrace : l'identifiant de la trace
-        * @return : un objet
-        *           un objet de la classe Trace si $idTrace existe
+        * @return : un objet de la classe Trace si $idTrace existe 
         *           l'objet null si $idTrace n'existe pas
         * @speciality :  utiliser la méthode getLesPointsDeTrace($idTrace) pour obtenir les points de la trace et
         *                les ajouter à l'objet Trace qui sera retourné
         */
     {
-
-
-
-
+        if ($this->getLesPointsDeTrace($idTrace == 0)) 
+        {
+        return null;
+        }
+        else 
+        return $Trace;
     }
         
     
