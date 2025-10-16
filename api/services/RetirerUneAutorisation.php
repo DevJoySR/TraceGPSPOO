@@ -30,7 +30,7 @@ global $ADR_MAIL_EMETTEUR, $ADR_SERVICE_WEB;
 $dao = new DAO();
 
 // Récupération des données transmises
-$pseudoAutorise = (empty($this->request['pseudo'])) ? "" : $this->request['pseudo'];
+$pseudo = (empty($this->request['pseudo'])) ? "" : $this->request['pseudo'];
 $mdpSha1 = (empty($this->request['mdp'])) ? "" : $this->request['mdp'];
 $pseudoAsupprimer = (empty($this->request['pseudoARetirer'])) ? '' : $this->request['pseudoARetirer'];
 $texteMessage = (empty($this->request['texteMessage'])) ? '' : $this->request['texteMessage'];
@@ -45,7 +45,7 @@ if ($this->getMethodeRequete() != "GET")
 else
 {
     // Test avec des paramètres incorrects ou incomplets
-    if ($pseudoAutorise == "" || $mdpSha1 == "" || $pseudoAsupprimer == "" || $texteMessage == "")
+    if ($pseudo == "" || $mdpSha1 == "" || $pseudoAsupprimer == "" || $texteMessage == "")
     {
         $msg = "Erreur : données incomplètes.";
         $code_reponse = 400;
@@ -53,7 +53,7 @@ else
     else
     {
         // Test de l'authentification de l'utilisateur demandeur
-        $niveauConnexion = $dao->getNiveauConnexion($pseudoAutorise, $mdpSha1);
+        $niveauConnexion = $dao->getNiveauConnexion($pseudo, $mdpSha1);
         
         if ($niveauConnexion == 0)
         {
@@ -63,7 +63,7 @@ else
         else
         {
             // Vérifier que le pseudo destinataire existe
-            if (!$dao->existePseudoUtilisateur($pseudoAsupprimer))
+            if ($dao->existePseudoUtilisateur($pseudoAsupprimer))
             {
                 $msg = "Erreur : pseudo utilisateur inexistant.";
                 $code_reponse = 400;
@@ -71,17 +71,16 @@ else
             else
             {
                 // Récupérer les utilisateurs
-                $utilisateurAutorise = $dao->getUnUtilisateur($pseudoAutorise);
-                $utilisateurAutorisant = $dao->getUnUtilisateur($pseudoAutorisant);
+                $utilisateur= $dao->getUnUtilisateur($pseudo);
+                $utilisateurASuppr = $dao->getUnUtilisateur($pseudoAsupprimer);
 
-                $idAutorise = $utilisateurAutorise->getId();
-                $idAutorisant = $utilisateurAutorisant->getId();
-                $adrMailAutorisant = $utilisateurAutorisant->getAdrMail();
+                $idUtilisateur = $utilisateur->getId();
+                $idASuppr = $utilisateurASuppr->getId();
 
                 // Vérifier que l'autorisation n'existe pas déjà
-                if ($dao->autoriseAConsulter($idAutorisant, $idAutorise))
+                if (!$dao->autoriseAConsulter($idASuppr, $idUtilisateur))
                 {
-                    $msg = "Erreur : autorisation déjà accordée.";
+                    $msg = "Erreur : L'autorisation n'est pas accordée.";
                     $code_reponse = 400;
                 }
             }
