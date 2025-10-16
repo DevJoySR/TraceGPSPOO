@@ -120,7 +120,7 @@ class Rest {
                 $lesEntrees[$cle] = $this->remettreEnFormeLesEntrees($valeur);
             }
         } else {
-                $data = stripslashes($data);                
+            $data = stripslashes($data);                
             $data = strip_tags($data);
             $lesEntrees = trim($data);
         }
