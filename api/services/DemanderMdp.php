@@ -36,7 +36,7 @@ if ($this->getMethodeRequete() != "POST" && $this->getMethodeRequete() != "GET")
         $code_reponse = 400;
     } else {
         // Vérifier que le pseudo existe
-        if (strlen($pseudo) < 8 || $dao->existePseudoUtilisateur($pseudo)) {
+        if (! $dao->existePseudoUtilisateur($pseudo)) {
             $msg = "Erreur : pseudo inexistant.";
             $code_reponse = 404;
         } else {
