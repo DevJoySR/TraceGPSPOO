@@ -26,7 +26,7 @@ $lang = (empty($this->request['lang'])) ? "" : $this->request['lang'];
 if ($lang != "json") $lang = "xml";
 
 // On vérifie la méthode HTTP (préférer POST ici pour plus de sécurité)
-if ($this->getMethodeRequete() != "POST") {
+if ($this->getMethodeRequete() != "POST" && $this->getMethodeRequete() != "GET") {
     $msg = "Erreur : méthode HTTP incorrecte.";
     $code_reponse = 406;
 } else {
