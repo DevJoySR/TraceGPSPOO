@@ -49,6 +49,7 @@ else {
         }
         else
         {   // Vérifie l'existence de la trace à supprimer
+            $unUtilisateur = $dao->getUnUtilisateur($pseudo);
             if (! $dao->getLesTraces($idTrace, $unUtilisateur))
             {
                 $msg = "parcours inexistant.";
