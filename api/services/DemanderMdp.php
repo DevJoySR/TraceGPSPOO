@@ -56,7 +56,7 @@ if ($this->getMethodeRequete() != "POST" && $this->getMethodeRequete() != "GET")
                     $msg = "Enregistrement effectué ; l'envoi du courriel de confirmation a rencontré un problème.";
                     $code_reponse = 500;
                 } else {
-                    $msg = "Enregistrement effectué ; vous allez recevoir un courriel avec votre nouveau mot de passe.";
+                    $msg = "Vous allez recevoir un courriel de confirmation avec votre nouveau mot de passe";
                     $code_reponse = 200;
                 }
             }
