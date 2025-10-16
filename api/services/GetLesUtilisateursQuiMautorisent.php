@@ -15,7 +15,7 @@
 //          • Fournir la liste des utilisateurs qu'il autorise à consulter ses parcours
 // Le service retourne un flux de données XML ou JSON contenant un compte-rendu d'exécution
 
-// connexion du serveur web à la base MySQL
+// connexion du serveur web à la base MySQL 
 $dao = new DAO(); 
 
 // Récupération des données transmises
