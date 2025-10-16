@@ -28,6 +28,8 @@ if ($lang != "json") $lang = "xml";
 // initialisation du nombre de réponses
 $nbReponses = 0;
 $lesUtilisateurs = array();
+$msg = "";
+$code_reponse = 200;
 
 // On vérifie la méthode HTTP (préférer POST ici pour plus de sécurité)
 if ($this->getMethodeRequete() != "POST" && $this->getMethodeRequete() != "GET") {
@@ -44,15 +46,21 @@ if ($this->getMethodeRequete() != "POST" && $this->getMethodeRequete() != "GET")
     		$msg = "Erreur : authentification incorrecte.";
     		$code_reponse = 401;
         }
-        else 
-    	{	// récupération de la liste des utilisateurs à l'aide de la méthode getTousLesUtilisateurs de la classe DAO
-    	    $lesUtilisateurs = $dao->getLesUtilisateursAutorises($pseudo);
-
-            // mémorisation du nombre d'utilisateurs
-    	    $nbReponses = sizeof($lesUtilisateurs);
+        else {
+        $utilisateur = $dao->getUnUtilisateur($pseudo);
+        if ($utilisateur == null) {
+            $msg = "Acune autorisation accordée par $pseudo.";
+            $code_reponse = 404;
+        } else {
+            $lesUtilisateurs = $dao->getLesUtilisateursAutorises($utilisateur->getId());
+            $nbReponses = sizeof($lesUtilisateurs);
+            $msg = "$nbReponses autorisation(s) accordée(s) par $pseudo.";
+            $code_reponse = 200;
+        }
         }
     }
 }
+
 // ferme la connexion à MySQL :
 unset($dao);
 
