@@ -28,8 +28,6 @@ if ($lang != "json") $lang = "xml";
 // initialisation du nombre de réponses
 $nbReponses = 0;
 $lesUtilisateurs = array();
-$msg = "";
-$code_reponse = 200;
 
 // On vérifie la méthode HTTP (préférer POST ici pour plus de sécurité)
 if ($this->getMethodeRequete() != "POST" && $this->getMethodeRequete() != "GET") {
@@ -111,7 +109,7 @@ function creerFluxXML($msg, $lesUtilisateurs)
              </lesUtilisateurs>
           </donnees>
         </data>
-     */
+   */
 
     // crée une instance de DOMdocument (DOM : Document Object Model)
     $doc = new DOMDocument();
