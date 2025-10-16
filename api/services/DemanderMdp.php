@@ -87,7 +87,7 @@ exit;
 // création du flux XML en sortie
 function creerFluxXML($msg)
 {	
-    /* Exemple de code JSON
+    /* Exemple de code XML
          <?xml version="1.0" encoding="UTF-8"?>
          <!--Service web DemanderMdp - BTS SIO - Lycée De La Salle - Rennes-->
          <data>
