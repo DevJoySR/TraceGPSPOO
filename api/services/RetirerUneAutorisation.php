@@ -1,23 +1,27 @@
 <?php
 // Projet TraceGPS - services web
-// fichier : api/services/DemanderUneAutorisation.php
+// fichier :  api/services/RetirerUneAutorisation.php
 // Dernière mise à jour : 16/10/2025 par VV
 
-// Rôle : ce service web permet à un utilisateur de demander une autorisation à un autre utilisateur.
+// Rôle : ce service web permet à un utilisateur de supprimer une autorisation qu'il avait accordée à un
+//        autre utilisateur
 
-// Le service web doit être appelé avec 6 paramètres obligatoires dont les noms sont volontairement non significatifs :
-// pseudo : le pseudo de l'utilisateur qui demande l'autorisation
-// mdp : le mot de passe hashé en sha1 de l'utilisateur qui demande l'autorisation
-// pseudoDestinataire : le pseudo de l'utilisateur à qui on demande l'autorisation
-// texteMessage : le texte d'un message accompagnant la demande
-// nomPrenom : le nom et le prénom du demandeur
+// Le service web doit être appelé avec 4 paramètres obligatoires dont les noms sont volontairement non significatifs :
+// pseudo : le pseudo de l'utilisateur qui retire l'autorisation
+// mdp : le mot de passe hashé en sha1 de l'utilisateur qui retire l'autorisation
+// pseudoARetirer : le pseudo de l'utilisateur à qui on veut retirer l'autorisation
+// texteMessage : le texte d'un message accompagnant la suppression
 // lang : le langage utilisé pour le flux de données ("xml" ou "json")
 
+
 // Description du traitement :
-// Vérifier que les données transmises sont complètes
-// Vérifier l'authentification de l'utilisateur demandeur
-// Vérifier que le pseudo de l'utilisateur destinataire existe
-// Envoyer un courriel à l'utilisateur destinataire
+//  Vérifier que les données transmises sont complètes
+//  Vérifier l'authentification de l'utilisateur qui veut supprimer une autorisation
+//  Vérifier l'existence du pseudo de l'utilisateur à qui on désire supprimer l'autorisation
+//  Vérifier que l'autorisation à retirer était bien accordée
+//  Supprimer l'autorisation dans la base de données
+//  Envoyer un courriel à l'utilisateur à qui on a supprimé l'autorisation (uniquement si le texte du
+// message n'est pas vide)
 
 // ces variables globales sont définies dans le fichier modele/parametres.php
 global $ADR_MAIL_EMETTEUR, $ADR_SERVICE_WEB;
@@ -28,9 +32,8 @@ $dao = new DAO();
 // Récupération des données transmises
 $pseudoAutorise = (empty($this->request['pseudo'])) ? "" : $this->request['pseudo'];
 $mdpSha1 = (empty($this->request['mdp'])) ? "" : $this->request['mdp'];
-$pseudoAutorisant = (empty($this->request['pseudoDestinataire'])) ? '' : $this->request['pseudoDestinataire'];
+$pseudoAsupprimer = (empty($this->request['pseudoARetirer'])) ? '' : $this->request['pseudoARetirer'];
 $texteMessage = (empty($this->request['texteMessage'])) ? '' : $this->request['texteMessage'];
-$nomPrenom = (empty($this->request['nomPrenom'])) ? '' : $this->request['nomPrenom'];
 $lang = (empty($this->request['lang'])) ? '' : $this->request['lang'];
 
 // La méthode HTTP utilisée doit être GET
@@ -42,7 +45,7 @@ if ($this->getMethodeRequete() != "GET")
 else
 {
     // Test avec des paramètres incorrects ou incomplets
-    if ($pseudoAutorise == "" || $mdpSha1 == "" || $pseudoAutorisant == "" || $texteMessage == "" || $nomPrenom == "")
+    if ($pseudoAutorise == "" || $mdpSha1 == "" || $pseudoAsupprimer == "" || $texteMessage == "")
     {
         $msg = "Erreur : données incomplètes.";
         $code_reponse = 400;
@@ -60,37 +63,34 @@ else
         else
         {
             // Vérifier que le pseudo destinataire existe
-            if (!$dao->existePseudoUtilisateur($pseudoAutorisant))
+            if (!$dao->existePseudoUtilisateur($pseudoAsupprimer))
             {
                 $msg = "Erreur : pseudo utilisateur inexistant.";
                 $code_reponse = 400;
             }
             else
             {
-                // Envoyer un mail de notification au destinataire
-                $sujetMail = "Demande d'autorisation TraceGPS de " . $nomPrenom;
-                $contenuMail = "Bonjour " . $pseudoAutorisant . ",\n\n";
-                $contenuMail .= $nomPrenom . " (" . $pseudoAutorise . ") souhaite que vous l'autorisiez à consulter vos parcours.\n\n";
-                $contenuMail .= "Message : " . $texteMessage . "\n\n";
-                $contenuMail .= "Cordialement,\n";
-                $contenuMail .= "L'administrateur du système TraceGPS";
+                // Récupérer les utilisateurs
+                $utilisateurAutorise = $dao->getUnUtilisateur($pseudoAutorise);
+                $utilisateurAutorisant = $dao->getUnUtilisateur($pseudoAutorisant);
 
-                $ok = Outils::envoyerMail($adrMailAutorisant, $sujetMail, $contenuMail, $ADR_MAIL_EMETTEUR);
+                $idAutorise = $utilisateurAutorise->getId();
+                $idAutorisant = $utilisateurAutorisant->getId();
+                $adrMailAutorisant = $utilisateurAutorisant->getAdrMail();
 
-                if (!$ok)
+                // Vérifier que l'autorisation n'existe pas déjà
+                if ($dao->autoriseAConsulter($idAutorisant, $idAutorise))
                 {
-                    $msg = "Erreur : l'envoi du courriel de demande d'autorisation a rencontré un problème.";
-                    $code_reponse = 500;
+                    $msg = "Erreur : autorisation déjà accordée.";
+                    $code_reponse = 400;
                 }
-                else
-                {
-                    $msg = $pseudoAutorisant . " va recevoir un courriel avec votre demande.";
-                    $code_reponse = 200;
-                }   
             }
         }
     }
 }
+
+
+
 
 unset($dao);   // ferme la connexion à MySQL
 
