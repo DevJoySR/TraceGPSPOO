@@ -67,26 +67,43 @@ else
             }
             else
             {
-                // Envoyer un mail de notification au destinataire
-                $sujetMail = "Demande d'autorisation TraceGPS de " . $nomPrenom;
-                $contenuMail = "Bonjour " . $pseudoAutorisant . ",\n\n";
-                $contenuMail .= $nomPrenom . " (" . $pseudoAutorise . ") souhaite que vous l'autorisiez à consulter vos parcours.\n\n";
-                $contenuMail .= "Message : " . $texteMessage . "\n\n";
-                $contenuMail .= "Cordialement,\n";
-                $contenuMail .= "L'administrateur du système TraceGPS";
+                // Récupérer les utilisateurs
+                $utilisateurAutorise = $dao->getUnUtilisateur($pseudoAutorise);
+                $utilisateurAutorisant = $dao->getUnUtilisateur($pseudoAutorisant);
 
-                $ok = Outils::envoyerMail($adrMailAutorisant, $sujetMail, $contenuMail, $ADR_MAIL_EMETTEUR);
+                $idAutorise = $utilisateurAutorise->getId();
+                $idAutorisant = $utilisateurAutorisant->getId();
+                $adrMailAutorisant = $utilisateurAutorisant->getAdrMail();
 
-                if (!$ok)
+                // Vérifier que l'autorisation n'existe pas déjà
+                if ($dao->autoriseAConsulter($idAutorisant, $idAutorise))
                 {
-                    $msg = "Erreur : l'envoi du courriel de demande d'autorisation a rencontré un problème.";
-                    $code_reponse = 500;
+                    $msg = "Erreur : autorisation déjà accordée.";
+                    $code_reponse = 400;
                 }
                 else
                 {
-                    $msg = $pseudoAutorisant . " va recevoir un courriel avec votre demande.";
-                    $code_reponse = 200;
-                }   
+                    // Envoyer un mail de notification au destinataire
+                    $sujetMail = "Demande d'autorisation TraceGPS de " . $nomPrenom;
+                    $contenuMail = "Bonjour " . $pseudoAutorisant . ",\n\n";
+                    $contenuMail .= $nomPrenom . " (" . $pseudoAutorise . ") souhaite que vous l'autorisiez à consulter vos parcours.\n\n";
+                    $contenuMail .= "Message : " . $texteMessage . "\n\n";
+                    $contenuMail .= "Cordialement,\n";
+                    $contenuMail .= "L'administrateur du système TraceGPS";
+
+                    $ok = Outils::envoyerMail($adrMailAutorisant, $sujetMail, $contenuMail, $ADR_MAIL_EMETTEUR);
+
+                    if (!$ok)
+                    {
+                        $msg = "Erreur : l'envoi du courriel de demande d'autorisation a rencontré un problème.";
+                        $code_reponse = 500;
+                    }
+                    else
+                    {
+                        $msg = $pseudoAutorisant . " va recevoir un courriel avec votre demande.";
+                        $code_reponse = 200;
+                    }
+                }
             }
         }
     }
