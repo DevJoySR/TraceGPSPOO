@@ -67,6 +67,58 @@ else {
  echo "<p>Echec lors de la suppression de la trace !</p>";
 }
 
+// test des méthodes creerUnPointDeTrace et terminerUneTrace --------------------------------------
+// modifié par dP le 15/8/2021
+echo "<h3>Test de terminerUneTrace : </h3>";
+// on choisit une trace non terminée
+$unIdTrace = 3;
+// on l'affiche
+$laTrace = $dao->getUneTrace($unIdTrace);
+echo "<h4>l'objet laTrace avant l'appel de la méthode terminerUneTrace : </h4>";
+echo ($laTrace->toString());
+echo ('<br>');
+// on la termine
+$dao->terminerUneTrace($unIdTrace);
+// et on l'affiche à nouveau
+$laTrace = $dao->getUneTrace($unIdTrace);
+echo "<h4>l'objet laTrace après l'appel de la méthode terminerUneTrace : </h4>";
+echo ($laTrace->toString());
+echo ('<br>');
+
+// test de la méthode getLesTraces($idUtilisateur) ------------------------------------------------
+// modifié par dP le 14/8/2021
+echo "<h3>Test de getLesTraces(idUtilisateur) : </h3>";
+$lesTraces = $dao->getLesTraces(2);
+$nbReponses = sizeof($lesTraces);
+echo "<p>Nombre de traces de l'utilisateur 2 : " . $nbReponses . "</p>";
+// affichage des traces
+foreach ($lesTraces as $uneTrace)
+{ echo ($uneTrace->toString());
+ echo ('<br>');
+}
+
+
+
+// test de la méthode getLesTracesAutorisees($idUtilisateur) --------------------------------------
+// modifié par dP le 14/8/2021
+echo "<h3>Test de getLesTracesAutorisees(idUtilisateur) : </h3>";
+$lesTraces = $dao->getLesTracesAutorisees(2);
+$nbReponses = sizeof($lesTraces);
+echo "<p>Nombre de traces autorisées à l'utilisateur 2 : " . $nbReponses . "</p>";
+// affichage des traces
+foreach ($lesTraces as $uneTrace)
+{ echo ($uneTrace->toString());
+ echo ('<br>');
+}
+$lesTraces = $dao->getLesTracesAutorisees(3);
+$nbReponses = sizeof($lesTraces);
+echo "<p>Nombre de traces autorisées à l'utilisateur 3 : " . $nbReponses . "</p>";
+// affichage des traces
+foreach ($lesTraces as $uneTrace)
+{ echo ($uneTrace->toString());
+ echo ('<br>');
+}
+
 
 
 

@@ -34,7 +34,6 @@ $dao = new DAO();
 // test de la méthode xxxxxxxxxxxxxxxxxxxxxxxxxxx ----------------------------------------------------------
 // modifié par xxxxxxxxxxxxxxxxx le xxxxxxxxxx
 echo "<h3>Test de Valentin : </h3>";
-// A CONTINUER .........
 
 // test de la méthode supprimerUneAutorisation ----------------------------------------------------
 // modifié par dP le 13/8/2021
@@ -87,7 +86,23 @@ $nbPoints = sizeof($lesPoints);
 echo "<p>Nombre de points de la trace 1 : " . $nbPoints . "</p>";
 echo ('<br>');
 
-
+// test de la méthode getUneTrace -----------------------------------------------------------------
+// modifié par dP le 14/8/2021
+echo "<h3>Test de getUneTrace : </h3>";
+$uneTrace = $dao->getUneTrace(2);
+if ($uneTrace) {
+ echo "<p>La trace 2 existe : <br>" . $uneTrace->toString() . "</p>";
+}
+else {
+ echo "<p>La trace 2 n'existe pas !</p>";
+}
+$uneTrace = $dao->getUneTrace(100);
+if ($uneTrace) {
+ echo "<p>La trace 100 existe : <br>" . $uneTrace->toString() . "</p>";
+}
+else {
+ echo "<p>La trace 100 n'existe pas !</p>";
+}
 
 
 

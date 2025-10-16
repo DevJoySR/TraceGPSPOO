@@ -140,34 +140,35 @@ class Trace
         }
     }
 
-    public function getDenivele()
+   public function getDenivele()
+{
+    if ($this->lesPointsDeTrace == null || sizeof($this->lesPointsDeTrace) == 0)
     {
-        if ($this->lesPointsDeTrace == null || sizeof($this->lesPointsDeTrace) == 0)
+        return 0;
+    } 
+
+    $premierPoint = $this->lesPointsDeTrace[0];
+    $altitudeMin = $premierPoint->getAltitude();
+    $altitudeMax = $premierPoint->getAltitude();
+
+    for ($i = 1 ; $i < sizeof($this->lesPointsDeTrace) ; $i++)
+    {
+        $lePoint = $this->lesPointsDeTrace[$i];
+        if ($altitudeMin > $lePoint->getAltitude())
         {
-            return 0;
-        } 
-
-        $premierPoint = $this->lesPointsDeTrace[0];
-        $altitudeMin = $premierPoint->getAltitude();
-        $altitudeMax = $premierPoint->getAltitude();
-
-        for ($i = 1 ; $i < sizeof($this->lesPointsDeTrace) ; $i++)
+            $altitudeMin = $lePoint->getAltitude();
+        }
+        if ($altitudeMax < $lePoint->getAltitude())
         {
-            $lePoint = $this->lesPointsDeTrace[$i];
-            if ($altitudeMin > $lePoint->getAltitude())
-            {
-                $altitudeMin = $lePoint->getAltitude();
-            }
-            if ($altitudeMax < $lePoint->getAltitude())
-            {
-                $altitudeMax = $lePoint->getAltitude();
-            }
-
-            $Denivele = $altitudeMax - $altitudeMin;
-
-            return $Denivele;
+            $altitudeMax = $lePoint->getAltitude();
         }
     }
+
+    $Denivele = $altitudeMax - $altitudeMin;
+
+    return $Denivele;
+}
+
 
     public function getDureeEnSecondes()
     {
