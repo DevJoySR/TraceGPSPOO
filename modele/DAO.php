@@ -798,23 +798,14 @@ class DAO
 
     public function creerUneTrace($uneTrace) {
 
-        /*         creerUneTrace($uneTrace)
-         @Rôle : enregistre la trace $uneTrace dans la table tracegps_traces et met à jour l'objet $uneTrace
-         avec l'identifiant (auto_increment) attribué par le SGBD
-         Paramètres à fournir :
-         $uneTrace : la trace à enregistrer
-         @Valeur de retour : un booléen
-        true si l'enregistrement s'est bien passé
-        false sinon
-        Particularités :
-        -      Si la date de fin est nulle (cas d'une trace non terminée), le champ dateFin prendra une valeur
-                nulle (PDO::PARAM_NULL) ; sinon il prendra une valeur chaine (PDO::PARAM_STR).
-        - On n'enregistre pas les points de la trace, même si l'objet $uneTrace en contient.
-
-
-        @return : true or false
-            */
-
+        /*         
+        *   Enregistre la trace $uneTrace dans la table tracegps_traces et met à jour l'objet $uneTrace avec l'identifiant (auto_increment) attribué par le SGBD
+        *   @param  : $uneTrace : la trace à enregistrer
+        *   @returns : true si l'enregistrement s'est bien passé false sinon
+        *   @speciality : Si la date de fin est nulle (cas d'une trace non terminée), le champ dateFin prendra une valeur
+        *                 nulle (PDO::PARAM_NULL) ; sinon il prendra une valeur chaine (PDO::PARAM_STR).
+        *                 On n'enregistre pas les points de la trace, même si l'objet $uneTrace en contient.
+        */
 
         $txt_req = "INSERT INTO tracegps_traces (dateDebut, dateFin, terminee, idUtilisateur)";
         $txt_req .= " values (:dateDebut, :dateFin, :terminee, :IdUtilisateur)";
@@ -848,14 +839,10 @@ class DAO
 
 
     public function supprimerUneTrace($idTrace){
-        /*
-        @Rôle : supprime la trace d'identifiant $idTrace dans la table tracegps_traces, ainsi que tous ses points
-        dans la table tracegps_points
-        Paramètres à fournir :
-        $idTrace : l'identifiant de la trace à supprimer
-        @Valeur de retour : un booléen
-        true si la suppression s'est bien passée
-        false sinon
+        /*         
+        *   Supprime la trace d'identifiant $idTrace dans la table tracegps_traces, ainsi que tous ses points
+        *   @param  : $idTrace : l'identifiant de la trace à supprimer
+        *   @returns : rue si la suppression s'est bien passée false sinon
         */
 
         // préparation de la requête pour la table tracegps_points
@@ -884,6 +871,14 @@ class DAO
     }
 
     public function terminerUneTrace(int $idTrace): bool
+        /*         
+        *   Enregistre la fin de la trace d'identifiant $idTrace dans la table tracegps_traces ainsi que la date de fin
+        *   @param  : $idTrace : l'identifiant de la trace à terminer
+        *   @returns : true si la modification s'est bien passée false sinon
+        *   @speciality : Le champ terminee doit être mis à 1
+        *                 Le champ dateFin doit prendre comme valeur la date du dernier point de la trace (si la trace 
+        *                 contient des points) ou la date système (si la trace ne contient aucun point)
+        */
 {
     // 1) Chercher la date du dernier point
     $sqlMax = "SELECT MAX(dateHeure)
@@ -922,11 +917,12 @@ class DAO
 
         public function getLesTraces($idUtilisateur)
 
-        /*
-        @Rôle : >Fournit la collection des traces d'un utilisateurs
-        Paramètres à fournir :
-        $idUtilisateur : l'identifiant de l'utilisateur
-        @Valeur de retour : une collection d'objet Trace
+        /*         
+        *   Fournit la collection des traces de l'utilisateur $idUtilisateu
+        *   @param  : $idUtilisateur : identifiant de l'utilisateur dont on veut obtenir les traces
+        *   @returns : une collection d'objets Trace
+        *   @speciality : utiliser la méthode getLesPointsDeTrace($idTrace) pour obtenir les points de chaque 
+        *                 trace et les ajouter à chaque objet Trace qui sera ajouté à la collection
         */
         {
             $txt_req = "SELECT id, idUtilisateur, terminee, dateDebut, dateFin" ;
@@ -972,11 +968,9 @@ return $lesTraces;
 public function getLesTracesAutorisees($idUtilisateur): array
 {
     /*
-    @Rôle : Fournit la collection des traces de l'utilisateur 
-            qui ont été autorisées à au moins un autre utilisateur
-    Paramètres à fournir :
-    $idUtilisateur : l'identifiant de l'utilisateur
-    @Valeur de retour : une collection d'objets Trace
+    * Fournit la collection des traces de l'utilisateur qui ont été autorisées à au moins un autre utilisateur
+    * @param : $idUtilisateur : l'identifiant de l'utilisateur
+    * @return : une collection d'objets Trace
     */
     
     $txt_req = "SELECT t.*
