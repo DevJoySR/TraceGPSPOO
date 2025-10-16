@@ -57,7 +57,7 @@ else {
             }
             else
             {   // Vérifie si l'utilisateur est bien le propriétaire de la trace à supprimer
-                if (!$dao->getLesTraces($idTrace, $unUtilisateur->getId())) 
+                if (! $dao->getLesTraces($idTrace, $unUtilisateur->getId())) 
                 {
                     $msg = "vous n'êtes pas le propriétaire de ce parcours.";
                     $code_reponse = 400;
@@ -65,7 +65,7 @@ else {
                 else 
                 {
                     // suppression de la Trace dans la BDD
-                    $ok = $dao->supprimerUneTrace($idTrace, $Point);
+                    $ok = $dao->supprimerUneTrace($idTrace);
                     if ( ! $ok ) {
                         $msg = "Erreur : problème lors de la suppression du parcours.";
                         $code_reponse = 500;
