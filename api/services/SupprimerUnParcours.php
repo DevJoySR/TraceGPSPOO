@@ -50,14 +50,16 @@ else {
         else
         {   // Vérifie l'existence de la trace à supprimer
             $unUtilisateur = $dao->getUnUtilisateur($pseudo);
-            if (! $dao->getLesTraces($idTrace, $unUtilisateur))
+            $trace = $dao->getUneTrace($idTrace) ;
+            if ($trace == null)
             {
                 $msg = "parcours inexistant.";
                 $code_reponse = 400;
             }
             else
             {   // Vérifie si l'utilisateur est bien le propriétaire de la trace à supprimer
-                if (! $dao->getLesTraces($idTrace, $unUtilisateur->getId())) 
+                $proprietaire = $trace->getIdUtilisateur();
+                if ($proprietaire != $unUtilisateur->getId()) 
                 {
                     $msg = "vous n'êtes pas le propriétaire de ce parcours.";
                     $code_reponse = 400;
