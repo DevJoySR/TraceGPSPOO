@@ -42,6 +42,7 @@ if ($this->getMethodeRequete() != "POST") {
         } else {
             // création d'un mot de passe aléatoire de 8 caractères + le mot de passe sera hashé
             $nouveauMdp = Outils::creerMdp();
+            $hash = sha1($nouveauMdp);
 
             // Enregistrer le nouveau hash en base
             $ok = $dao->modifierMdpUtilisateur($pseudo, $hash);
