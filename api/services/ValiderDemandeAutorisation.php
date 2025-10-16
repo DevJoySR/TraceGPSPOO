@@ -25,7 +25,7 @@ $dao = new DAO();
 $mdpSha1 = ( empty($this->request['a'])) ? "" : $this->request['a'];
 $pseudoAutorisant = ( empty($this->request['b'])) ? "" : $this->request['b'];
 $pseudoAutorise = ( empty($this->request['c'])) ? "" : $this->request['c'];
-$decision = ( empty($this->request['d'])) ? "" : $this->request['d'];
+$decision = ( $this->request['d'] == 0) ? "0" : $this->request['d'];
 			 
 // La méthode HTTP utilisée doit être GET
 if ($this->getMethodeRequete() != "GET")
