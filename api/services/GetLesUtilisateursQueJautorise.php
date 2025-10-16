@@ -15,7 +15,7 @@
 // Le service retourne un flux de données XML ou JSON contenant un compte-rendu d'exécution
 
 // connexion du serveur web à la base MySQL
-$dao = new DAO();
+$dao = new DAO(); 
 
 // Récupération des données transmises
 $pseudo = (empty($this->request['pseudo'])) ? "" : $this->request['pseudo'];
