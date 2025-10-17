@@ -669,9 +669,6 @@ class DAO
             $req1 = $this->cnx->prepare($txt_req1);
             $req1->bindValue("idTrace",$idTrace, PDO::PARAM_INT);
             $ok1 = $req1->execute();
-
-            
-
             
         if ( ! $ok && ! $ok1) { return false; }
     
