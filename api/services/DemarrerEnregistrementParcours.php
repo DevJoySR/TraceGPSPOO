@@ -42,12 +42,10 @@ if ($this->getMethodeRequete() != "POST" && $this->getMethodeRequete() != "GET")
         } else {
             // création d'un nouveau parcours
             $unUtilisateur = $dao->getUnUtilisateur($pseudo);
-            $idUtilisateur = $unUtilisateur->getId();
-            $idNouvelleTrace = $dao->creerUneTrace($idUtilisateur);
+            $ok = $dao->creerUneTrace($uneTrace);
 
-            if ($idNouvelleTrace) {
-            $nouvelleTrace = $dao->getUneTrace($idNouvelleTrace);
-
+            if ($ok) {
+            $nouvelleTrace = $dao->getUneTrace($uneTrace->getId());
             if ($nouvelleTrace) {
                 $msg = "Trace créée.";
                 $code_reponse = 200;
