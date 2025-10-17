@@ -42,6 +42,13 @@ if ($this->getMethodeRequete() != "POST" && $this->getMethodeRequete() != "GET")
         } else {
             // création d'un nouveau parcours
             $unUtilisateur = $dao->getUnUtilisateur($pseudo);
+            $uneTrace = new Trace(
+                null,
+                date("Y-m-d H:i:s"),
+                null,
+                0,
+                $unUtilisateur->getId()
+            );
             $ok = $dao->creerUneTrace($uneTrace);
 
             if ($ok) {
