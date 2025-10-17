@@ -45,7 +45,7 @@ if ($this->getMethodeRequete() != "GET")
 else
 {
     // Test avec des paramètres incorrects ou incomplets
-    if ($pseudo == "" || $mdpSha1 == "" || $pseudoAsupprimer == "" || $texteMessage == "")
+    if ($pseudo == "" || $mdpSha1 == "" || $pseudoAsupprimer == "")
     {
         $msg = "Erreur : données incomplètes.";
         $code_reponse = 400;
@@ -63,7 +63,7 @@ else
         else
         {
             // Vérifier que le pseudo destinataire existe
-            if ($dao->existePseudoUtilisateur($pseudoAsupprimer))
+            if (!$dao->existePseudoUtilisateur($pseudoAsupprimer))
             {
                 $msg = "Erreur : pseudo utilisateur inexistant.";
                 $code_reponse = 400;
@@ -76,12 +76,42 @@ else
 
                 $idUtilisateur = $utilisateur->getId();
                 $idASuppr = $utilisateurASuppr->getId();
+                $adresseDestinataire = $utilisateurASuppr->getAdrMail();
 
                 // Vérifier que l'autorisation n'existe pas déjà
                 if (!$dao->autoriseAConsulter($idASuppr, $idUtilisateur))
                 {
-                    $msg = "Erreur : L'autorisation n'est pas accordée.";
+                    $msg = "Erreur : L'autorisation n'était pas accordée.";
                     $code_reponse = 400;
+                }
+                else
+                {
+                    $dao -> supprimerUneAutorisation($idUtilisateur, $idASuppr);
+                    $msg = "Autorisation supprimée";
+                    $code_reponse = 200;
+                }
+                   if ($texteMessage !="")
+                {
+                    // Envoyer un mail de notification au destinataire
+                    $sujetMail = "Suppression d'autorisation sur TraceGPS de " . $pseudo;
+                    $contenuMail = "Bonjour " . $pseudoAsupprimer . ",\n\n";
+                    $contenuMail .= $pseudo . "à supprimé l'autorisation qu'il vous avait accordé.\n\n";
+                    $contenuMail .= "Message : " . $texteMessage . "\n\n";
+                    $contenuMail .= "Cordialement,\n";
+                    $contenuMail .= "L'administrateur du système TraceGPS";
+
+                    $ok = Outils::envoyerMail($pseudoAsupprimer, $sujetMail, $contenuMail, $ADR_MAIL_EMETTEUR);
+
+                    if ($ok)
+                    {
+                        $msg = "Autorisation supprimée; " .$pseudoAsupprimer . " va recevoir un courriel de notification.";
+                        $code_reponse = 200;
+                    }
+                    else
+                    {
+                        $msg = "Erreur : Autorisation supprimée; l'envoi du courriel de notification a rencontré un problème.";
+                        $code_reponse = 500;
+                    }
                 }
             }
         }
