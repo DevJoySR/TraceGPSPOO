@@ -22,6 +22,8 @@ $lang = ( empty($this->request['lang'])) ? "" : $this->request['lang'];
 
 $lesTraces = array();
 $laTrace = null;
+$msg = "";
+$code_reponse = null;
 
 // La méthode HTTP utilisée doit être GET
 if ($this->getMethodeRequete() != "GET")
@@ -56,6 +58,7 @@ else {
 
 
                  if (!$autorise && $proprietaire != $id){
+                    $laTrace = null;
                     $msg = "Erreur : Vous n'êtes pas autorisé par le propriétaire du parcours.";
                     $code_reponse = 403;
                  }
