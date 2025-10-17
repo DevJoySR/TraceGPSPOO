@@ -43,14 +43,22 @@ if ($this->getMethodeRequete() != "POST" && $this->getMethodeRequete() != "GET")
             // création d'un nouveau parcours
             $unUtilisateur = $dao->getUnUtilisateur($pseudo);
             $idUtilisateur = $unUtilisateur->getId();
-            $resultat = $dao->creerUneTrace($idUtilisateur);
-            if ($resultat == true) {
+            $idNouvelleTrace = $dao->creerUneTrace($idUtilisateur);
+
+            if ($idNouvelleTrace) {
+            $nouvelleTrace = $dao->getUneTrace($idNouvelleTrace);
+
+            if ($nouvelleTrace) {
                 $msg = "Trace créée.";
-                $code_reponse = 402;
+                $code_reponse = 200;
             } else {
+                $msg = "Impossible de créer la Trace";
+                $code_reponse = 500;
+            }
+        } else {
             $msg = "Trace non créée.";
             $code_reponse = 500;
-            }
+        }
         }   
     }
 }       
