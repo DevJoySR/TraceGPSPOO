@@ -119,7 +119,32 @@ function creerFluxXML($msg)
 	// place l'élément 'reponse' juste après l'élément 'data'
 	$elt_reponse = $doc->createElement('reponse', $msg);
 	$elt_data->appendChild($elt_reponse);
-	
+
+     // traitement des utilisateurs
+    if ($lesTraces != null) {
+        foreach ($lesTraces as $uneTrace) {
+        // place l'élément 'donnees' dans l'élément 'data'
+        $elt_donnees = $doc->createElement('donnees');
+        $elt_data->appendChild($elt_donnees);      
+       
+        // Création de l'élément 'trace'
+        $elt_trace = $doc->createElement('trace');
+        $elt_donnees->appendChild($elt_trace);
+       
+        // Ajout des données de la trace
+        $elt_id = $doc->createElement('id', $uneTrace->getId());
+        $elt_trace->appendChild($elt_id);
+       
+        $elt_dateHeureDebut = $doc->createElement('dateHeureDebut', $uneTrace->getDateHeureDebut());
+        $elt_trace->appendChild($elt_dateHeureDebut);
+       
+        $elt_terminee = $doc->createElement('terminee', $uneTrace->getTerminee());
+        $elt_trace->appendChild($elt_terminee);
+       
+        $elt_idUtilisateur = $doc->createElement('idUtilisateur', $uneTrace->getIdUtilisateur());
+        $elt_trace->appendChild($elt_idUtilisateur);
+        }
+
 	// Mise en forme finale
 	$doc->formatOutput = true;
 	
@@ -150,6 +175,31 @@ function creerFluxJSON($msg)
     $elt_racine = ["data" => $elt_data];
 //     $elt_racine = array("data" => $elt_data);
     
+if ($lesTraces == null) {
+        // Pas de données à renvoyer
+        $elt_data = ["reponse" => $msg];
+    }
+    else {
+        // Construction de l'objet trace
+        $objetTrace = array(
+            "id" => $lesTraces->getId(),
+            "dateHeureDebut" => $lesTraces->getDateHeureDebut(),
+            "terminee" => $lesTraces->getTerminee(),
+            "idUtilisateur" => $lesTraces->getIdUtilisateur()
+        );
+ 
+        // Construction de l'élément "donnees"
+        $elt_donnees = array(
+            "trace" => $objetTrace,
+        );
+ 
+        // Construction de l'élément "data"
+        $elt_data = ["reponse" => $msg, "donnees" => $elt_donnees];
+    }
+ 
+    // Construction de la racine
+    $elt_racine = ["data" => $elt_data];
+
     // retourne le contenu JSON (l'option JSON_PRETTY_PRINT gère les sauts de ligne et l'indentation)
     return json_encode($elt_racine, JSON_PRETTY_PRINT);
 }
