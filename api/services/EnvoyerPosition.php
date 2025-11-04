@@ -55,7 +55,7 @@ if ($this->getMethodeRequete() != "GET")
 else
 {
     // Test avec des paramètres incorrects ou incomplets
-    if ($pseudo == "" || $mdpSha1 == "" || $unIdTrace == "" || $uneDateHeure == "" || $uneLatitude == "" || $uneLongitude == "" || $uneAltitude == "" || $unRythmeCardio === "")
+    if ($pseudo == "" || $mdpSha1 == "" || $unIdTrace == "" || $uneDateHeure == "" || $uneLatitude == "" || $uneLongitude == "" || $uneAltitude == "" || $unRythmeCardio == "")
     {
         $msg = "Erreur : données incomplètes.";
         $code_reponse = 400;
@@ -109,7 +109,7 @@ else
                         // Créer le nouveau point de trace
                         $nouveauPoint = new PointDeTrace(
                             $unIdTrace,
-                            0,
+                            $numPoint,
                             $uneLatitude,
                             $uneLongitude,
                             $uneAltitude,
