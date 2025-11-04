@@ -17,6 +17,7 @@
 
 // connexion du serveur web à la base MySQL
 $dao = new DAO();
+$laTrace = null;
 
 // Récupération des données transmises
 $pseudo = (empty($this->request['pseudo'])) ? "" : $this->request['pseudo'];
@@ -42,27 +43,31 @@ if ($this->getMethodeRequete() != "POST" && $this->getMethodeRequete() != "GET")
         } else {
             // création d'un nouveau parcours
             $unUtilisateur = $dao->getUnUtilisateur($pseudo);
-            $uneTrace = new Trace(
+            $laTrace = new Trace(
                 null,
                 date("Y-m-d H:i:s"),
                 null,
                 0,
                 $unUtilisateur->getId()
             );
-            $ok = $dao->creerUneTrace($uneTrace);
 
+            $ok = $dao->creerUneTrace($laTrace);
+            
             if ($ok) {
-            $nouvelleTrace = $dao->getUneTrace($uneTrace->getId());
+            $nouvelleTrace = $dao->getUneTrace($laTrace->getId());
             if ($nouvelleTrace) {
                 $msg = "Trace créée.";
                 $code_reponse = 200;
+                $laTrace = $nouvelleTrace;
             } else {
                 $msg = "Impossible de créer la Trace";
                 $code_reponse = 500;
+                $laTrace = null;
             }
         } else {
             $msg = "Trace non créée.";
             $code_reponse = 500;
+            $laTrace = null;
         }
         }   
     }
@@ -74,11 +79,11 @@ unset($dao);
 // création du flux en sortie
 if ($lang == "xml") {
     $content_type = "application/xml; charset=utf-8";      // indique le format XML pour la réponse
-    $donnees = creerFluxXML ($msg);
+    $donnees = creerFluxXML ($msg, $laTrace);
 }
 else {
     $content_type = "application/json; charset=utf-8";      // indique le format Json pour la réponse
-    $donnees = creerFluxJSON ($msg);
+    $donnees = creerFluxJSON ($msg, $laTrace);
 }
 
 // envoi de la réponse HTTP
