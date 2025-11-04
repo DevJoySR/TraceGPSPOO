@@ -1,7 +1,6 @@
 <?php
 // Projet TraceGPS - services web
 // fichier : api/services/GetTousLesUtilisateurs.php
-// Dernière mise à jour : 3/7/2021 par dP
 
 // Rôle : ce service permet à un utilisateur authentifié d'obtenir la liste de tous les utilisateurs (de niveau 1)
 // Le service web doit recevoir 3 paramètres :
