@@ -22,6 +22,10 @@ $mdpSha1 = ( empty($this->request['mdp'])) ? "" : $this->request['mdp'];
 $pseudoConsulte = ( empty($this->request['pseudoConsulte'])) ? "" : $this->request['pseudoConsulte'];
 $lang = ( empty($this->request['lang'])) ? "" : $this->request['lang'];
 
+$msg = "";
+$code_reponse = null;
+
+
 
 // La méthode HTTP utilisée doit être GET
 if ($this->getMethodeRequete() != "GET")
@@ -32,29 +36,41 @@ else {
     // Les paramètres doivent être présents
     if ( $pseudo == "" || $mdpSha1 == "" )
     {	$msg = "Erreur : données incomplètes.";
+        $lesTraces = null;
         $code_reponse = 400;
     }
     else
     {	if ( $dao->getNiveauConnexion($pseudo, $mdpSha1) == 0 ) {
     		$msg = "Erreur : authentification incorrecte.";
+            $lesTraces = null;
     		$code_reponse = 401;
         }
     	else 
     	{	
             // on regarde si la trace existe, et si elle n'est pas nu
-             if ( $dao->existePseudoUtilisateur($pseudo) == false) {
+             if ( $dao->existePseudoUtilisateur($pseudoConsulte) == false) {
                 $msg = "Erreur : pseudo consulté inexistant.";
+                $lesTraces = null;
                 $code_reponse = 402;
             }
+                
             else{
-                // on récupère l'id de l'utilisateur depuis le dao
+                // on récupère l'id de l'utilisateur possiblement autorisé depuis le dao
                 $utilisateurAutorise = $dao->getUnUtilisateur($pseudo);
                 $id = $utilisateurAutorise->getId();
 
-                $proprietaire = $dao->autoriseAConsulter($pseudoConsulte, $id);
-                $lesTraces = $dao->getLesTraces($id);
+                // on récupère l'id de l'utilisateur de qui on va consulté la trace
+                $utilisateurConsulte = $dao->getUnUtilisateur($pseudoConsulte);
+                $idConsulte = $utilisateurConsulte->getId();
+               
+                // puis on regarde si l'utilisateur consulté à autoriser le visionnage
+                $autorise = $dao->autoriseAConsulter($idConsulte, $id);
 
-                 if (!$autorise && $proprietaire != $id){
+
+                // et on indente les traces de l'utilisateur de qui ont consulte les traces
+                $lesTraces = $dao->getLesTraces($idConsulte);
+
+                 if ($id !=$idConsulte && !$autorise){
                     $lesTraces = null;
                     $msg = "Erreur : Vous n'êtes pas autorisé par le propriétaire du parcours.";
                     $code_reponse = 403;
@@ -152,8 +168,14 @@ function creerFluxXML($msg, $lesTraces)
         $elt_terminee = $doc->createElement('terminee', $uneTrace->getTerminee());
         $elt_trace->appendChild($elt_terminee);
         
-        $elt_dateHeureFin = $doc->createElement('dateHeureFin', $uneTrace->getDateHeureFin());
-        $elt_trace->appendChild($elt_dateHeureFin);
+        // Récupère d'abord la valeur
+    $dateHeureFin = $uneTrace->getDateHeureFin();
+
+    // Vérifie qu'elle n'est pas NULL avant de créer l'élément
+    if ($dateHeureFin !== null && $dateHeureFin !== "") {
+    $elt_dateHeureFin = $doc->createElement('dateHeureFin', $dateHeureFin);
+    $elt_trace->appendChild($elt_dateHeureFin);
+    }
         
         $elt_idUtilisateur = $doc->createElement('idUtilisateur', $uneTrace->getIdUtilisateur());
         $elt_trace->appendChild($elt_idUtilisateur);
@@ -214,18 +236,34 @@ if ($lesTraces == null) {
         $elt_data = ["reponse" => $msg];
     }
     else {
-        // Construction de l'objet trace
-        $objetTrace = array(
-            "id" => $lesTraces->getId(),
-            "dateHeureDebut" => $lesTraces->getDateHeureDebut(),
-            "terminee" => $lesTraces->getTerminee(),
-            "dateHeureFin" => $lesTraces->getDateHeureFin(),
-            "idUtilisateur" => $lesTraces->getIdUtilisateur()
-        );
+        $tableauTraces = [];
+        
+        foreach ($lesTraces as $uneTrace) {
+            // Construction d'UN objet trace
+            $objetTrace = array(
+                "id" => $uneTrace->getId(),
+                "dateHeureDebut" => $uneTrace->getDateHeureDebut(),
+                "terminee" => $uneTrace->getTerminee(),
+                "idUtilisateur" => $uneTrace->getIdUtilisateur()
+            );
 
-        // Construction de l'élément "donnees"
+            // Ajout conditionnel de dateHeureFin
+            $dateHeureFin = $uneTrace->getDateHeureFin();
+            if ($dateHeureFin !== null && $dateHeureFin !== "") {
+                $objetTrace["dateHeureFin"] = $dateHeureFin;
+            }
+            
+            // Ajout conditionnel de distance
+            $distance = $uneTrace->getDistanceTotale();
+            if ($distance !== null && $distance !== "") {
+                $objetTrace["distance"] = $distance;
+            }
+
+            $tableauTraces[] = $objetTrace;
+        }
+
         $elt_donnees = array(
-            "trace" => $objetTrace,
+            "lesTraces" => $tableauTraces
         );
 
         // Construction de l'élément "data"
@@ -237,6 +275,4 @@ if ($lesTraces == null) {
 
     return json_encode($elt_racine, JSON_PRETTY_PRINT);
 }
-
-
 ?>
