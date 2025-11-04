@@ -90,7 +90,7 @@ exit;
 // ================================================================================================
 
 // création du flux XML en sortie
-function creerFluxXML($msg)
+function creerFluxXML($msg, $laTrace)
 {	
     /* Exemple de code XML
          <?xml version="1.0" encoding="UTF-8"?>
@@ -131,16 +131,16 @@ function creerFluxXML($msg)
         $elt_donnees->appendChild($elt_trace);
        
         // Ajout des données de la trace
-        $elt_id = $doc->createElement('id', $uneTrace->getId());
+        $elt_id = $doc->createElement('id', $laTrace->getId());
         $elt_trace->appendChild($elt_id);
        
-        $elt_dateHeureDebut = $doc->createElement('dateHeureDebut', $uneTrace->getDateHeureDebut());
+        $elt_dateHeureDebut = $doc->createElement('dateHeureDebut', $laTrace->getDateHeureDebut());
         $elt_trace->appendChild($elt_dateHeureDebut);
        
-        $elt_terminee = $doc->createElement('terminee', $uneTrace->getTerminee());
+        $elt_terminee = $doc->createElement('terminee', $laTrace->getTerminee());
         $elt_trace->appendChild($elt_terminee);
        
-        $elt_idUtilisateur = $doc->createElement('idUtilisateur', $uneTrace->getIdUtilisateur());
+        $elt_idUtilisateur = $doc->createElement('idUtilisateur', $laTrace->getIdUtilisateur());
         $elt_trace->appendChild($elt_idUtilisateur);
         }
 
@@ -154,7 +154,7 @@ function creerFluxXML($msg)
 // ================================================================================================
 
 // création du flux JSON en sortie
-function creerFluxJSON($msg)
+function creerFluxJSON($msg, $laTrace)
 {
     /* Exemple de code JSON 
         {
