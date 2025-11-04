@@ -121,8 +121,7 @@ function creerFluxXML($msg)
 	$elt_data->appendChild($elt_reponse);
 
      // traitement des utilisateurs
-    if ($lesTraces != null) {
-        foreach ($lesTraces as $uneTrace) {
+    if ($laTrace != null) {
         // place l'élément 'donnees' dans l'élément 'data'
         $elt_donnees = $doc->createElement('donnees');
         $elt_data->appendChild($elt_donnees);      
@@ -175,17 +174,17 @@ function creerFluxJSON($msg)
     $elt_racine = ["data" => $elt_data];
 //     $elt_racine = array("data" => $elt_data);
     
-if ($lesTraces == null) {
+if ($laTrace == null) {
         // Pas de données à renvoyer
         $elt_data = ["reponse" => $msg];
     }
     else {
         // Construction de l'objet trace
         $objetTrace = array(
-            "id" => $lesTraces->getId(),
-            "dateHeureDebut" => $lesTraces->getDateHeureDebut(),
-            "terminee" => $lesTraces->getTerminee(),
-            "idUtilisateur" => $lesTraces->getIdUtilisateur()
+            "id" => $laTrace->getId(),
+            "dateHeureDebut" => $laTrace->getDateHeureDebut(),
+            "terminee" => $laTrace->getTerminee(),
+            "idUtilisateur" => $laTrace->getIdUtilisateur()
         );
  
         // Construction de l'élément "donnees"
@@ -202,7 +201,6 @@ if ($lesTraces == null) {
 
     // retourne le contenu JSON (l'option JSON_PRETTY_PRINT gère les sauts de ligne et l'indentation)
     return json_encode($elt_racine, JSON_PRETTY_PRINT);
-}
 }
 
 // ================================================================================================
