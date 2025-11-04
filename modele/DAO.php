@@ -345,7 +345,7 @@ class DAO
     // Développeur 3 : lignes 884 à 1150
 
     // Quelques conseils pour le travail collaboratif :
-    // avant d'attaquer un cycle de développement (début de séance, nouvelle méthode, ...), faites un Pull pour récupérer 
+    // avant d'attaquer un cycle de développement (début de séance, nouvelle méthode, ...), faites un Pull pour récupérer
     // la dernière version du fichier.
     // Après avoir testé et validé une méthode, faites un commit et un push pour transmettre cette version aux autres développeurs.
 
@@ -387,7 +387,7 @@ class DAO
     public function getLesUtilisateursAutorisant($idUtilisateur)
     /*
     *   Fournit la collection des utilisateurs (de niveau 1) autorisant l'utilisateur $idUtilisateur à voir leurs parcours
-    *   
+    *  
     *   @param : string $idUtilisateur
     *   @returns : la collection des utilisateurs qui ont donné l'autorisation à $idUtilisateur, soit collection d'objets Utilisateur
     */
@@ -450,7 +450,7 @@ class DAO
     public function getLesUtilisateursAutorises($idUtilisateur)
     /*
     *   Fournit la collection des utilisateurs (de niveau 1) autorisés à voir les parcours de l'utilisateur $idUtilisateur
-    *   
+    *  
     *   @param : string $idUtilisateur
     *   @returns : la collection des utilisateurs qui ont donné l'autorisation à $idUtilisateur, soit collection d'objets Utilisateur
     */
@@ -513,7 +513,7 @@ class DAO
     public function autoriseAConsulter($idAutorisant, $idAutorise)
     /*
     *   Indique si l'utilisateur $idAutorisant autorise l'utilisateur $idAutorise à consulter ses traces
-    *   
+    *  
     *   @param : $idAutorisant : l'id de l'utilisateur qui autorise
     *            $idAutorise : l'id de l'utilisateur qui est autorisé
     *   @returns : true si l'autorisation est donnée false sinon
@@ -545,7 +545,7 @@ class DAO
     public function creerUneAutorisation($idAutorisant, $idAutorise)
     /*
     *   Enregistre l'autorisation ($idAutorisant, $idAutorise) dans la table tracegps_autorisations
-    *   
+    *  
     *   Appel de la méthode autoriseAConsulter() afin de déterminer si l'autorisation a déjà été emise
     *
     *   @param : $idAutorisant : l'id de l'utilisateur qui autorise
@@ -607,7 +607,7 @@ class DAO
     public function creerUneTrace($uneTrace)
     {
 
-        /*         
+        /*        
         *   Enregistre la trace $uneTrace dans la table tracegps_traces et met à jour l'objet $uneTrace avec l'identifiant (auto_increment) attribué par le SGBD
         *   @param  : $uneTrace : la trace à enregistrer
         *   @returns : true si l'enregistrement s'est bien passé false sinon
@@ -655,12 +655,12 @@ class DAO
 
     public function supprimerUneTrace($idTrace, $uneTrace)
     {
-        /*         
+        /*        
         *   Supprime la trace d'identifiant $idTrace dans la table tracegps_traces, ainsi que tous ses points
         *   @param  : $idTrace : l'identifiant de la trace à supprimer
         *   @returns : rue si la suppression s'est bien passée false sinon
         */
-        
+       
         $dao = new DAO();
         $trace = $dao->getUneTrace($uneTrace);
         if ($trace === null) {
@@ -691,12 +691,12 @@ class DAO
     }
 
     public function terminerUneTrace(int $idTrace): bool
-    /*         
+    /*        
         *   Enregistre la fin de la trace d'identifiant $idTrace dans la table tracegps_traces ainsi que la date de fin
         *   @param  : $idTrace : l'identifiant de la trace à terminer
         *   @returns : true si la modification s'est bien passée false sinon
         *   @speciality : Le champ terminee doit être mis à 1
-        *                 Le champ dateFin doit prendre comme valeur la date du dernier point de la trace (si la trace 
+        *                 Le champ dateFin doit prendre comme valeur la date du dernier point de la trace (si la trace
         *                 contient des points) ou la date système (si la trace ne contient aucun point)
         */
     {
@@ -734,11 +734,11 @@ class DAO
 
     public function getLesTraces($idUtilisateur)
 
-    /*         
+    /*        
         *   Fournit la collection des traces de l'utilisateur $idUtilisateu
         *   @param  : $idUtilisateur : identifiant de l'utilisateur dont on veut obtenir les traces
         *   @returns : une collection d'objets Trace
-        *   @speciality : utiliser la méthode getLesPointsDeTrace($idTrace) pour obtenir les points de chaque 
+        *   @speciality : utiliser la méthode getLesPointsDeTrace($idTrace) pour obtenir les points de chaque
         *                 trace et les ajouter à chaque objet Trace qui sera ajouté à la collection
         */
     {
@@ -837,7 +837,7 @@ class DAO
     public function supprimerUneAutorisation($idAutorisant, $idAutorise): bool
     /*
         *   Enregistre l'autorisation ($idAutorisant, $idAutorise) dans la table tracegps_autorisations
-        *   
+        *  
         *   Appel de la méthode autoriseAConsulter() afin de déterminer si l'autorisation a déjà été emise
         *
         *   @param : $idAutorisant : l'id de l'utilisateur qui autorise
@@ -933,8 +933,8 @@ class DAO
         try {
 
             // Insertion du point de trace
-            $txt_req = "INSERT INTO tracegps_points 
-                    (idTrace, id, latitude, longitude, altitude, dateHeure, 
+            $txt_req = "INSERT INTO tracegps_points
+                    (idTrace, id, latitude, longitude, altitude, dateHeure,
                      rythmeCardio)
                     VALUES (:idTrace, :id, :latitude, :longitude, :altitude, :dateHeure,
                             :rythmeCardio)";
@@ -955,8 +955,8 @@ class DAO
             // Si c'est le premier point de la trace (id = 1)
             if ($ok && $unPointDeTrace->getId() == 1) {
                 // Mise à jour de la date de début de la trace
-                $txt_req2 = "UPDATE tracegps_traces 
-                        SET dateDebut = :dateDebut 
+                $txt_req2 = "UPDATE tracegps_traces
+                        SET dateDebut = :dateDebut
                         WHERE id = :idTrace";
 
                 $req2 = $this->cnx->prepare($txt_req2);
@@ -976,7 +976,7 @@ class DAO
     /*
         * rôle :  fournit un objet Trace à partir de son identifiant $idTrace
         * @param : $idTrace : l'identifiant de la trace
-        * @return : un objet de la classe Trace si $idTrace existe 
+        * @return : un objet de la classe Trace si $idTrace existe
         *           l'objet null si $idTrace n'existe pas
         * @speciality :  utiliser la méthode getLesPointsDeTrace($idTrace) pour obtenir les points de la trace et
         *                les ajouter à l'objet Trace qui sera retourné
