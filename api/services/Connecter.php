@@ -14,9 +14,9 @@
 //     http://<hébergeur>/tracegps/api/Connecter?pseudo=europa&mdp=13e3668bbee30b004380052b086457b014504b3e&lang=xml
 
 // Pour tester le service avec CURL :
-// curl -i -X GET "http://localhost/ws-php-dp/tracegps/api/Connecter?pseudo=europa&mdp=13e3668bbee30b004380052b086457b014504b3e&lang=json"
-// curl -i -X GET "http://localhost/ws-php-dp/tracegps/api/Connecter?pseudo=europa&mdp=13e3668bbee30b004380052b086457b014504b3e&lang=xml"
-// curl -i -X POST "http://localhost/ws-php-dp/tracegps/api/Connecter?pseudo=europa&mdp=13e3668bbee30b004380052b086457b014504b3e&lang=json"
+// curl -i -X GET "http://localhost/TraceGPSPOO/api/Connecter?pseudo=europa&mdp=13e3668bbee30b004380052b086457b014504b3e&lang=json"
+// curl -i -X GET "http://localhost/TraceGPSPOO/api/Connecter?pseudo=europa&mdp=13e3668bbee30b004380052b086457b014504b3e&lang=xml"
+// curl -i -X POST "http://localhost/TraceGPSPOO/api/Connecter?pseudo=europa&mdp=13e3668bbee30b004380052b086457b014504b3e&lang=json"
 
 // curl -i -X GET "http://sio.lyceedelasalle.fr/tracegps/api/Connecter?pseudo=europa&mdp=13e3668bbee30b004380052b086457b014504b3e&lang=json"
 // curl -i -X GET "http://sio.lyceedelasalle.fr/tracegps/api/Connecterr?pseudo=europa&mdp=13e3668bbee30b004380052b086457b014504b3e&lang=json"
