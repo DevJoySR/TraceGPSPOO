@@ -45,6 +45,7 @@ $lang = (empty($this->request['lang'])) ? '' : $this->request['lang'];
 // Initialisation des variables de réponse
 $msg = "";
 $code_reponse = 200;
+$idPoint = null;
 
 // La méthode HTTP utilisée doit être GET
 if ($this->getMethodeRequete() != "GET")
@@ -70,7 +71,7 @@ else
             $msg = "Erreur : authentification incorrecte.";
             $code_reponse = 401;
         }
-       else
+        else
         {
             $laTrace = $dao->getUneTrace($unIdTrace);
             if ($laTrace == null)
@@ -83,10 +84,10 @@ else
                 // Récupérer l'utilisateur authentifié
                 $utilisateur = $dao->getUnUtilisateur($pseudo);
                 $idUtilisateur = $utilisateur->getId();
-                
+
                 // Récupérer le propriétaire de la trace
                 $idProprietaire = $laTrace->getIdUtilisateur();
-                
+
                 // Comparer les ID numériques
                 if ($idProprietaire != $idUtilisateur)
                 {
@@ -105,7 +106,7 @@ else
                         // Calculer le numéro du point
                         $lesPoints = $dao->getLesPointsDeTrace($unIdTrace);
                         $numPoint = count($lesPoints) + 1;
-                        
+
                         // Créer le nouveau point de trace
                         $nouveauPoint = new PointDeTrace(
                             $unIdTrace,
@@ -119,10 +120,10 @@ else
                             0,
                             0
                         );
-                        
+
                         // Enregistrer le point dans la base de données
                         $ok = $dao->creerUnPointDeTrace($nouveauPoint);
-                        
+
                         if ($ok == false)
                         {
                             $msg = "Erreur : problème lors de l'enregistrement du point.";
@@ -130,6 +131,8 @@ else
                         }
                         else
                         {
+                            // Créer l'ID du point (format: idTrace-numPoint)
+                            $idPoint = $unIdTrace . "-" . $numPoint;
                             $msg = "Point créé.";
                             $code_reponse = 200;
                         }
@@ -145,11 +148,11 @@ unset($dao);   // ferme la connexion à MySQL
 // création du flux en sortie
 if ($lang == "xml") {
     $content_type = "application/xml; charset=utf-8";      // indique le format XML pour la réponse
-    $donnees = creerFluxXML($msg);
+    $donnees = creerFluxXML($msg, $idPoint);
 }
 else {
     $content_type = "application/json; charset=utf-8";      // indique le format Json pour la réponse
-    $donnees = creerFluxJSON($msg);
+    $donnees = creerFluxJSON($msg, $idPoint);
 }
 
 // envoi de la réponse HTTP
@@ -161,7 +164,7 @@ exit;
 // ================================================================================================
 
 // création du flux XML en sortie
-function creerFluxXML($msg)
+function creerFluxXML($msg, $idPoint = null)
 {
     $doc = new DOMDocument();
     $doc->version = '1.0';
@@ -176,6 +179,12 @@ function creerFluxXML($msg)
     $elt_reponse = $doc->createElement('reponse', htmlspecialchars($msg, ENT_XML1));
     $elt_data->appendChild($elt_reponse);
 
+    // Ajouter l'ID du point si disponible
+    if ($idPoint !== null) {
+        $elt_idPoint = $doc->createElement('idPoint', htmlspecialchars($idPoint, ENT_XML1));
+        $elt_data->appendChild($elt_idPoint);
+    }
+
     $doc->formatOutput = true;
 
     return $doc->saveXML();
@@ -184,12 +193,19 @@ function creerFluxXML($msg)
 // ================================================================================================
 
 // création du flux JSON en sortie
-function creerFluxJSON($msg)
+function creerFluxJSON($msg, $idPoint = null)
 {
     $elt_data = ["reponse" => $msg];
+    
+    // Ajouter l'ID du point si disponible
+    if ($idPoint !== null) {
+        $elt_data["idPoint"] = $idPoint;
+    }
+    
     $elt_racine = ["data" => $elt_data];
 
     return json_encode($elt_racine, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 }
 
 // ================================================================================================
+?>
