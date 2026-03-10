@@ -132,11 +132,7 @@ function creerFluxXML($msg)
      */
 
     // crée une instance de DOMdocument (DOM : Document Object Model)
-	$doc = new DOMDocument();
-	
-	// specifie la version et le type d'encodage
-	$doc->version = '1.0';
-	$doc->encoding = 'UTF-8';
+	$doc = new DOMDocument('1.0', 'UTF-8');
 	
 	// crée un commentaire et l'encode en UTF-8
 	$elt_commentaire = $doc->createComment('Service web SupprimerUnParcours - BTS SIO - Lycée De La Salle - Rennes');

@@ -621,50 +621,46 @@ class DAO
         if ($trace === null) {
         } else {
 
-        $txt_req = "INSERT INTO tracegps_traces (dateDebut, dateFin, terminee, idUtilisateur)";
-        $txt_req .= " values (:dateDebut, :dateFin, :terminee, :IdUtilisateur)";
+            $txt_req = "INSERT INTO tracegps_traces (dateDebut, dateFin, terminee, idUtilisateur)";
+            $txt_req .= " values (:dateDebut, :dateFin, :terminee, :IdUtilisateur)";
 
-        $req = $this->cnx->prepare($txt_req);
+            $req = $this->cnx->prepare($txt_req);
 
 
-        //$req->bindValue(":id", mb_convert_encoding($UneTrace->getid , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_INT);
-        $req->bindValue(":dateDebut", $uneTrace->getDateHeureDebut(), PDO::PARAM_STR);
-        // On regarde si dateFin n'est pas null (elle l'est si la trace n'est pas terminée)
-        // on le remplacera donc par null
-        if ($uneTrace->getDateHeureFin() === null) {
-            $req->bindValue(":dateFin", null, PDO::PARAM_NULL);
-        } else {
-            $req->bindValue(":dateFin", $uneTrace->getDateHeureFin(), PDO::PARAM_STR);
-        }
-        $req->bindValue(":terminee", $uneTrace->getTerminee(), PDO::PARAM_STR);
-        $req->bindValue(":IdUtilisateur", $uneTrace->getIdUtilisateur(), PDO::PARAM_INT);
+            //$req->bindValue(":id", mb_convert_encoding($UneTrace->getid , 'UTF-8', 'ISO-8859-1'), PDO::PARAM_INT);
+            $req->bindValue(":dateDebut", $uneTrace->getDateHeureDebut(), PDO::PARAM_STR);
+            // On regarde si dateFin n'est pas null (elle l'est si la trace n'est pas terminée)
+            // on le remplacera donc par null
+            if ($uneTrace->getDateHeureFin() === null) {
+                $req->bindValue(":dateFin", null, PDO::PARAM_NULL);
+            } else {
+                $req->bindValue(":dateFin", $uneTrace->getDateHeureFin(), PDO::PARAM_STR);
+            }
+            $req->bindValue(":terminee", $uneTrace->getTerminee(), PDO::PARAM_STR);
+            $req->bindValue(":IdUtilisateur", $uneTrace->getIdUtilisateur(), PDO::PARAM_INT);
 
-        // exécution de la requête
-        $ok = $req->execute();
-        // sortir en cas d'échec
-        if (! $ok) {
-            return false;
-        }
+            // exécution de la requête
+            $ok = $req->execute();
+            // sortir en cas d'échec
+            if (! $ok) {
+                return false;
+            }
 
-        // recherche de l'identifiant (auto_increment) qui a été attribué à la trace
-        $unId = $this->cnx->lastInsertId();
-        $uneTrace->setId($unId);
-        return true;
+            // recherche de l'identifiant (auto_increment) qui a été attribué à la trace
+            $unId = $this->cnx->lastInsertId();
+            $uneTrace->setId($unId);
+            return true;
         }
     }
 
-    public function supprimerUneTrace($idTrace, $uneTrace)
+    public function supprimerUneTrace($idTrace)
     {
         /*
         *   Supprime la trace d'identifiant $idTrace dans la table tracegps_traces, ainsi que tous ses points
         *   @param  : $idTrace : l'identifiant de la trace à supprimer
-        *   @returns : rue si la suppression s'est bien passée false sinon
+        *   @returns : retourne si la suppression s'est bien passée false sinon
         */
 
-        $dao = new DAO();
-        $trace = $dao->getUneTrace($uneTrace);
-        if ($trace === null) {
-        } else {
         // préparation de la requête pour la table tracegps_points
         $txt_req = "DELETE FROM tracegps_points";
         $txt_req .= " WHERE idTrace = :idTrace";
@@ -682,13 +678,12 @@ class DAO
         $req1->bindValue("idTrace", $idTrace, PDO::PARAM_INT);
         $ok1 = $req1->execute();
 
-        if (! $ok && ! $ok1) {
+        if (! $ok || ! $ok1) {   // OU logique
             return false;
         }
-
         return true;
     }
-    }
+
 
     public function terminerUneTrace(int $idTrace): bool
     /*
