@@ -53,7 +53,7 @@ else {
             $trace = $dao->getUneTrace($idTrace) ;
             if ($trace == null)
             {
-                $msg = "parcours inexistant.";
+                $msg = "Erreur : parcours inexistant.";
                 $code_reponse = 400;
             }
             else
@@ -61,7 +61,7 @@ else {
                 $proprietaire = $trace->getIdUtilisateur();
                 if ($proprietaire != $unUtilisateur->getId()) 
                 {
-                    $msg = "vous n'êtes pas le propriétaire de ce parcours.";
+                    $msg = "Erreur : Vous n'êtes pas le propriétaire de ce parcours.";
                     $code_reponse = 400;
                 }
                 else 
