@@ -670,7 +670,6 @@ class DAO
         // exécution de la requête
         $ok = $req->execute();
 
-
         // préparation de la requête pour la table tracegps_traces
         $txt_req1 = "DELETE FROM tracegps_traces";
         $txt_req1 .= " WHERE id = :idTrace";
